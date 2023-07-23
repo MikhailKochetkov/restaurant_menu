@@ -50,7 +50,7 @@ async def create_dish(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if session.query(Dish).filter_by(submenu_id=submenu_id).first():
+    if session.query(Dish).filter_by(title=request.title, submenu_id=submenu_id).first():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='dish already exists'
