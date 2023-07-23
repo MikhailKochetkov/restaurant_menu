@@ -67,7 +67,7 @@ async def create_dish(
     }
 
 
-@dish_router.get('api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', tags=['Get dishes'])
+@dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', tags=['Get dishes'])
 async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
     dishes = session.query(Dish).filter_by(submenu_id=submenu_id).all()
     if not session.query(Menu).filter_by(id=menu_id).first():
@@ -75,7 +75,7 @@ async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(g
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not session.query(SubMenu).filter_by(id=submenu_id).first():
+    if not session.query(SubMenu).filter_by(id=submenu_id, menu_id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
