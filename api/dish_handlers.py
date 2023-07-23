@@ -5,6 +5,7 @@ from fastapi import (
     status)
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
+from uuid import uuid4
 
 from db.models import Dish, Menu, SubMenu
 from db.session import get_db
@@ -16,35 +17,39 @@ dish_router = APIRouter()
 @dish_router.post(
     '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
     response_model=DishCreateResponse,
-    tags=['Create dish'])
+    tags=['Create dish'],
+    status_code=201)
 async def create_dish(
+        menu_id: str,
+        submenu_id: str,
         request: DishCreateRequest,
         session: Session = Depends(get_db)):
     try:
         dish = Dish(
+            id=str(uuid4()),
             title=request.title,
             description=request.description,
-            price=request.price,
-            submenu_id=request.submenu_id)
+            price=str(round(request.price, 2)),
+            submenu_id=submenu_id)
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='The data are not valid.'
+            detail='the data are not valid'
         )
-    if not session.query(SubMenu).filter_by(id=request.submenu_id).first():
+    if not session.query(SubMenu).filter_by(id=submenu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Submenu does not exist.'
+            detail='submenu does not exist'
         )
-    if not session.query(Menu).filter_by(id=request.menu_id).first():
+    if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Menu does not exist.'
+            detail='menu does not exist'
         )
-    if session.query(Dish).filter_by(submenu_id=request.submenu_id).first():
+    if session.query(Dish).filter_by(submenu_id=submenu_id).first():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail='Dish already exists.'
+            detail='dish already exists'
         )
     session.add(dish)
     session.commit()
@@ -54,26 +59,22 @@ async def create_dish(
         "id": dish.id,
         "title": dish.title,
         "description": dish.description,
-        "price": round(dish.price, 2)}
+        "price": dish.price
+    }
 
 
 @dish_router.get('api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', tags=['Get dishes'])
-async def get_dishes(menu_id: int, submenu_id: int, session: Session = Depends(get_db)):
+async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
     dishes = session.query(Dish).filter_by(submenu_id=submenu_id).all()
-    if not dishes:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Dishes not found."
-        )
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Menu does not exist.'
+            detail='menu does not exist'
         )
     if not session.query(SubMenu).filter_by(id=submenu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Submenu does not exist.'
+            detail='submenu does not exist'
         )
     result = []
     for dish in dishes:
@@ -81,59 +82,60 @@ async def get_dishes(menu_id: int, submenu_id: int, session: Session = Depends(g
             "id": dish.id,
             "title": dish.title,
             "description": dish.description,
-            "price": round(dish.price, 2)
+            "price": dish.price
         }
         result.append(data)
     return result
 
 
 @dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Get dish by id'])
-async def get_dish_by_id(menu_id: int, submenu_id: int, dish_id: int, session: Session = Depends(get_db)):
+async def get_dish_by_id(menu_id: str, submenu_id: str, dish_id: str, session: Session = Depends(get_db)):
     dish = session.query(Dish).filter_by(id=dish_id).first()
     if not dish:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Dish not found."
+            detail='dish not found'
         )
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Menu does not exist.'
+            detail='menu does not exist'
         )
     if not session.query(SubMenu).filter_by(id=submenu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Submenu does not exist.'
+            detail='submenu does not exist'
         )
-    return {"id": dish.id,
-            "title": dish.title,
-            "description": dish.description,
-            "price": round(dish.price, 2)
-            }
+    return {
+        "id": dish.id,
+        "title": dish.title,
+        "description": dish.description,
+        "price": dish.price
+    }
 
 
 @dish_router.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Update dish'])
 async def update_dish(
-        menu_id: int,
-        submenu_id: int,
-        dish_id: int,
+        menu_id: str,
+        submenu_id: str,
+        dish_id: str,
         request: DishPatchRequest,
         session: Session = Depends(get_db)):
     dish = session.query(Dish).filter_by(id=dish_id).first()
     if not dish:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Dish not found.'
+            detail='dish not found.'
         )
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Menu does not exist.'
+            detail='menu does not exist'
         )
     if not session.query(SubMenu).filter_by(id=submenu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Submenu does not exist.'
+            detail='submenu does not exist'
         )
     if request.title:
         dish.title = request.title
@@ -148,26 +150,26 @@ async def update_dish(
 
 @dish_router.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Delete dish'])
 async def delete_dish(
-        menu_id: int,
-        submenu_id: int,
-        dish_id: int,
+        menu_id: str,
+        submenu_id: str,
+        dish_id: str,
         session: Session = Depends(get_db)):
     dish = session.query(Dish).filter_by(id=dish_id).first()
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Menu does not exist.'
+            detail='menu does not exist'
         )
     if not session.query(SubMenu).filter_by(id=submenu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Submenu does not exist.'
+            detail='submenu does not exist'
         )
     if not dish:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Dish not found.'
+            detail='dish not found'
         )
     session.delete(dish)
     session.commit()
-    return {"message": "Dish deleted successfully"}
+    return {"message": "dish deleted successfully"}

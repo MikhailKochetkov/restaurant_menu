@@ -7,6 +7,7 @@ class MenuCreateRequest(BaseModel):
 
 
 class MenuCreateResponse(BaseModel):
+    id: str
     title: str
     description: str
 
@@ -14,11 +15,10 @@ class MenuCreateResponse(BaseModel):
 class SubMenuCreateRequest(BaseModel):
     title: str
     description: str
-    menu_id: int
 
 
 class SubMenuCreateResponse(BaseModel):
-    id: int
+    id: str
     title: str
     description: str
 
@@ -27,15 +27,13 @@ class DishCreateRequest(BaseModel):
     title: str
     description: str
     price: float
-    menu_id: int
-    submenu_id: int
 
 
 class DishCreateResponse(BaseModel):
-    id: int
+    id: str
     title: str
     description: str
-    price: float
+    price: str
 
 
 class MenuPatchRequest(BaseModel):
