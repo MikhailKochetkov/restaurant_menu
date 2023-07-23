@@ -21,7 +21,7 @@ submenu_router = APIRouter()
 
 @submenu_router.post(
     '/api/v1/menus/{menu_id}/submenus',
-    tags=['Create submenu'],
+    tags=['Submenus'],
     response_model=SubMenuCreateResponse,
     status_code=201)
 async def create_submenu(
@@ -56,7 +56,7 @@ async def create_submenu(
     return {"id": submenu.id, "title": submenu.title, "description": submenu.description}
 
 
-@submenu_router.get('/api/v1/menus/{menu_id}/submenus', tags=['Get submenus'])
+@submenu_router.get('/api/v1/menus/{menu_id}/submenus', tags=['Submenus'])
 async def get_submenus(menu_id: str, session: Session = Depends(get_db)):
     submenus = session.query(SubMenu).filter_by(menu_id=menu_id).all()
     result = []
@@ -72,7 +72,7 @@ async def get_submenus(menu_id: str, session: Session = Depends(get_db)):
     return result
 
 
-@submenu_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Get submenu by id'])
+@submenu_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Submenus'])
 async def get_submenu_by_id(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
     submenu = check_submenu_by_menu_id(session, menu_id, submenu_id)
     dishes_count = session.query(func.count(Dish.id)).filter(Dish.submenu_id == submenu.id).scalar()
@@ -84,7 +84,7 @@ async def get_submenu_by_id(menu_id: str, submenu_id: str, session: Session = De
     }
 
 
-@submenu_router.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Update submenu'])
+@submenu_router.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Submenus'])
 async def update_submenu(
         menu_id: str,
         submenu_id: str,
@@ -110,7 +110,7 @@ async def update_submenu(
     return submenu
 
 
-@submenu_router.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Delete submenu'])
+@submenu_router.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Submenus'])
 async def delete_submenu(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
     submenu = check_submenu_by_menu_id(session, menu_id, submenu_id)
     session.delete(submenu)

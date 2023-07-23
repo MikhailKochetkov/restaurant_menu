@@ -21,7 +21,7 @@ menu_router = APIRouter()
 
 @menu_router.post(
     '/api/v1/menus',
-    tags=['Create menu'],
+    tags=['Menus'],
     response_model=MenuCreateResponse,
     status_code=201)
 async def create_menu(
@@ -46,7 +46,7 @@ async def create_menu(
     return {"id": menu.id, "title": menu.title, "description": menu.description}
 
 
-@menu_router.get('/api/v1/menus', tags=['Get menus'])
+@menu_router.get('/api/v1/menus', tags=['Menus'])
 async def get_menus(session: Session = Depends(get_db)):
     menus = session.query(Menu).all()
     result = []
@@ -64,7 +64,7 @@ async def get_menus(session: Session = Depends(get_db)):
     return result
 
 
-@menu_router.get('/api/v1/menus/{menu_id}', tags=['Get menu by id'])
+@menu_router.get('/api/v1/menus/{menu_id}', tags=['Menus'])
 async def get_menu_by_id(menu_id: str, session: Session = Depends(get_db)):
     menu = check_menu(session, menu_id)
     return {
@@ -76,7 +76,7 @@ async def get_menu_by_id(menu_id: str, session: Session = Depends(get_db)):
     }
 
 
-@menu_router.patch('/api/v1/menus/{menu_id}', tags=['Update menu'])
+@menu_router.patch('/api/v1/menus/{menu_id}', tags=['Menus'])
 async def update_menu(menu_id: str, request: MenuPatchRequest, session: Session = Depends(get_db)):
     menu = check_menu(session, menu_id)
     if request.title:
@@ -88,7 +88,7 @@ async def update_menu(menu_id: str, request: MenuPatchRequest, session: Session 
     return menu
 
 
-@menu_router.delete('/api/v1/menus/{menu_id}', tags=['Delete menu'])
+@menu_router.delete('/api/v1/menus/{menu_id}', tags=['Menus'])
 async def delete_menu(menu_id: str, session: Session = Depends(get_db)):
     menu = check_menu(session, menu_id)
     session.delete(menu)

@@ -20,7 +20,7 @@ class SubMenu(Base):
     id = Column(String, primary_key=True, index=True)
     title = Column(String)
     description = Column(String)
-    menu_id = Column(String, ForeignKey('menus.id'))
+    menu_id = Column(String, ForeignKey('menus.id'), nullable=False)
     menu = relationship('Menu', back_populates='submenus')
     dishes = relationship('Dish', back_populates='submenu', cascade='all, delete')
 
@@ -32,5 +32,5 @@ class Dish(Base):
     title = Column(String)
     description = Column(String)
     price = Column(String)
-    submenu_id = Column(String, ForeignKey('submenus.id'))
+    submenu_id = Column(String, ForeignKey('submenus.id'), nullable=False)
     submenu = relationship('SubMenu', back_populates='dishes')

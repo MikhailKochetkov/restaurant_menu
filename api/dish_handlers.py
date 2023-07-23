@@ -21,7 +21,7 @@ dish_router = APIRouter()
 @dish_router.post(
     '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
     response_model=DishCreateResponse,
-    tags=['Create dish'],
+    tags=['Dishes'],
     status_code=201)
 async def create_dish(
         menu_id: str,
@@ -67,20 +67,20 @@ async def create_dish(
     }
 
 
-@dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', tags=['Get dishes'])
+@dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', tags=['Dishes'])
 async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
-    dishes = session.query(Dish).filter_by(submenu_id=submenu_id).all()
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    # if not session.query(SubMenu).filter_by(id=submenu_id, menu_id=menu_id).first():
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND,
-    #         detail='submenu does not exist'
-    #     )
+    if not session.query(SubMenu).filter_by(id=submenu_id, menu_id=menu_id).first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='submenu does not exist'
+        )
     result = []
+    dishes = session.query(Dish).filter_by(submenu_id=submenu_id).all()
     for dish in dishes:
         data = {
             "id": dish.id,
@@ -92,7 +92,7 @@ async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(g
     return result
 
 
-@dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Get dish by id'])
+@dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Dishes'])
 async def get_dish_by_id(menu_id: str, submenu_id: str, dish_id: str, session: Session = Depends(get_db)):
     dish = check_dish(session, dish_id)
     if not session.query(Menu).filter_by(id=menu_id).first():
@@ -113,7 +113,7 @@ async def get_dish_by_id(menu_id: str, submenu_id: str, dish_id: str, session: S
     }
 
 
-@dish_router.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Update dish'])
+@dish_router.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Dishes'])
 async def update_dish(
         menu_id: str,
         submenu_id: str,
@@ -142,7 +142,7 @@ async def update_dish(
     return dish
 
 
-@dish_router.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Delete dish'])
+@dish_router.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Dishes'])
 async def delete_dish(
         menu_id: str,
         submenu_id: str,
