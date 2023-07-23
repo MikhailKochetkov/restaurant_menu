@@ -9,7 +9,11 @@ from uuid import uuid4
 
 from db.models import Dish, Menu, SubMenu
 from db.session import get_db
-from .schemas import DishCreateRequest, DishCreateResponse, DishPatchRequest
+from .schemas import (
+    DishCreateRequest,
+    DishCreateResponse,
+    DishPatchRequest)
+from .helpers import check_dish
 
 dish_router = APIRouter()
 
@@ -90,12 +94,7 @@ async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(g
 
 @dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Get dish by id'])
 async def get_dish_by_id(menu_id: str, submenu_id: str, dish_id: str, session: Session = Depends(get_db)):
-    dish = session.query(Dish).filter_by(id=dish_id).first()
-    if not dish:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='dish not found'
-        )
+    dish = check_dish(session, dish_id)
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -121,12 +120,7 @@ async def update_dish(
         dish_id: str,
         request: DishPatchRequest,
         session: Session = Depends(get_db)):
-    dish = session.query(Dish).filter_by(id=dish_id).first()
-    if not dish:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='dish not found.'
-        )
+    dish = check_dish(session, dish_id)
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -154,7 +148,7 @@ async def delete_dish(
         submenu_id: str,
         dish_id: str,
         session: Session = Depends(get_db)):
-    dish = session.query(Dish).filter_by(id=dish_id).first()
+    dish = check_dish(session, dish_id)
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -164,11 +158,6 @@ async def delete_dish(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
-        )
-    if not dish:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='dish not found'
         )
     session.delete(dish)
     session.commit()

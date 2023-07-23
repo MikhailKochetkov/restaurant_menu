@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from db.models import Menu, SubMenu
+from db.models import Menu, SubMenu, Dish
 
 
 def check_menu(session, menu_id):
@@ -25,5 +25,11 @@ def check_submenu_by_menu_id(session, menu_id, submenu_id):
     return submenu
 
 
-def check_dish():
-    pass
+def check_dish(session, dish_id):
+    dish = session.query(Dish).filter_by(id=dish_id).first()
+    if not dish:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='dish not found'
+        )
+    return dish
