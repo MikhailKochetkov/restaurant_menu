@@ -75,10 +75,12 @@ async def get_submenus(menu_id: str, session: Session = Depends(get_db)):
 @submenu_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Get submenu by id'])
 async def get_submenu_by_id(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
     submenu = check_submenu_by_menu_id(session, menu_id, submenu_id)
+    dishes_count = session.query(func.count(Dish.id)).filter(Dish.submenu_id == submenu.id).scalar()
     return {
         "id": submenu.id,
         "title": submenu.title,
-        "description": submenu.description
+        "description": submenu.description,
+        "dishes_count": dishes_count
     }
 
 
