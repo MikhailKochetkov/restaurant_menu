@@ -75,11 +75,11 @@ async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(g
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not session.query(SubMenu).filter_by(id=submenu_id, menu_id=menu_id).first():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='submenu does not exist'
-        )
+    # if not session.query(SubMenu).filter_by(id=submenu_id, menu_id=menu_id).first():
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail='submenu does not exist'
+    #     )
     result = []
     for dish in dishes:
         data = {
