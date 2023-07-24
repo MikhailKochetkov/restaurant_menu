@@ -1,4 +1,4 @@
-![restaurant_menu workflow](https://github.com/MikhailKochetkov/restaurant_menu/actions/workflows/main.yml/badge.svg?branch=master&event=push)
+![restaurant_menu workflow](https://github.com/MikhailKochetkov/restaurant_menu/actions/workflows/main.yml/badge.svg?branch=main&event=push)
 
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
