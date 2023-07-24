@@ -30,9 +30,9 @@ pip install -r requirements.txt
 
 Создать файл .env (шаблон наполнения размещен в файле .env.sample)
 
-### Запуск проекта в режиме разработки:
+### Запуск проекта в режиме разработки (БД SQLite):
 
-Установить тестовый режим в настройках проекта (файл settings.py):
+Установить режим разработчика в настройках проекта (файл settings.py):
 ```bash
 DEV_MODE = True
 ```
@@ -42,9 +42,28 @@ DEV_MODE = True
 uvicorn main:app
 ```
 
-### Запуск проекта в Docker (dockerfile):
+### Запуск проекта в режиме разработки (БД Postgresql):
 
-Установить тестовый режим в настройках проекта (файл settings.py):
+Создать базу данных с именем database
+
+Настроить режим разработчика в настройках проекта (файл settings.py):
+```bash
+DEV_MODE = False
+```
+
+Настроить (проверить) значение переменной среды DB_HOST (файл .env):
+```bash
+DB_HOST=localhost
+```
+
+Запустить проект:
+```bash
+uvicorn main:app
+```
+
+### Запуск проекта в Docker (dockerfile, БД SQLite):
+
+Настроить режим разработчика в настройках проекта (файл settings.py):
 ```bash
 DEV_MODE = True
 ```
@@ -69,11 +88,16 @@ docker container ls
 docker container stop <CONTAINER ID>
 ```
 
-### Запуск проекта в Docker (docker-compose):
+### Запуск проекта в Docker (docker-compose, БД Postgresql):
 
-Отключить тестовый режим в настройках проекта (файл settings.py):
+Настроить режим разработчика в настройках проекта (файл settings.py):
 ```bash
 DEV_MODE = False
+```
+
+Настроить (проверить) значение переменной среды DB_HOST (файл .env):
+```bash
+DB_HOST=db
 ```
 
 Собрать контейнеры:
