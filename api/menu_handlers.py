@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from uuid import uuid4
 
-from db.models import Menu, SubMenu, Dish
+from db.models import Menu, SubMenu
 from db.session import get_db
 from .schemas import (
     MenuCreateRequest,
@@ -59,8 +59,10 @@ async def get_menus(session: Session = Depends(get_db)):
     menus = session.query(Menu).all()
     result = []
     for menu in menus:
-        submenu_count = session.query(func.count(SubMenu.id)).filter(SubMenu.menu_id == menu.id).scalar()
-        dishes_count = session.query(func.count(Dish.submenu_id)).filter(Dish.submenu_id == SubMenu.id).scalar()
+        submenu_count = session.query(
+            func.count(SubMenu.id)
+        ).filter(SubMenu.menu_id == menu.id).scalar()
+        dishes_count = sum(len(submenu.dishes) for submenu in menu.submenus)
         data = {
             "id": menu.id,
             "title": menu.title,
@@ -79,8 +81,12 @@ async def get_menu_by_id(menu_id: str, session: Session = Depends(get_db)):
         "id": menu.id,
         "title": menu.title,
         "description": menu.description,
-        "submenus_count": session.query(func.count(SubMenu.id)).filter(SubMenu.menu_id == menu.id).scalar(),
-        "dishes_count": session.query(func.count(Dish.submenu_id)).filter(Dish.submenu_id == SubMenu.id).scalar()
+        "submenus_count": session.query(
+            func.count(SubMenu.id)
+        ).filter(SubMenu.menu_id == menu.id).scalar(),
+        "dishes_count": sum(
+            len(submenu.dishes) for submenu in menu.submenus
+        )
     }
 
 

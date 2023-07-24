@@ -65,7 +65,9 @@ async def get_submenus(menu_id: str, session: Session = Depends(get_db)):
     submenus = session.query(SubMenu).filter_by(menu_id=menu_id).all()
     result = []
     for submenu in submenus:
-        dishes_count = session.query(func.count(Dish.id)).filter(Dish.submenu_id == submenu.id).scalar()
+        dishes_count = session.query(
+            func.count(Dish.id)
+        ).filter(Dish.submenu_id == submenu.id).scalar()
         data = {
             "id": submenu.id,
             "title": submenu.title,
@@ -84,7 +86,9 @@ async def get_submenu_by_id(
         submenu_id: str,
         session: Session = Depends(get_db)):
     submenu = check_submenu_by_menu_id(session, menu_id, submenu_id)
-    dishes_count = session.query(func.count(Dish.submenu_id)).filter(Dish.submenu_id == submenu.id).scalar()
+    dishes_count = session.query(
+        func.count(Dish.submenu_id)
+    ).filter(Dish.submenu_id == submenu.id).scalar()
     return {
         "id": submenu.id,
         "title": submenu.title,
