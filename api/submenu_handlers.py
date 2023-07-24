@@ -53,7 +53,11 @@ async def create_submenu(
     session.commit()
     session.refresh(submenu)
     session.close()
-    return {"id": submenu.id, "title": submenu.title, "description": submenu.description}
+    return {
+        "id": submenu.id,
+        "title": submenu.title,
+        "description": submenu.description
+    }
 
 
 @submenu_router.get('/api/v1/menus/{menu_id}/submenus', tags=['Submenus'])
@@ -72,10 +76,15 @@ async def get_submenus(menu_id: str, session: Session = Depends(get_db)):
     return result
 
 
-@submenu_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Submenus'])
-async def get_submenu_by_id(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
+@submenu_router.get(
+    '/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    tags=['Submenus'])
+async def get_submenu_by_id(
+        menu_id: str,
+        submenu_id: str,
+        session: Session = Depends(get_db)):
     submenu = check_submenu_by_menu_id(session, menu_id, submenu_id)
-    dishes_count = session.query(func.count(Dish.id)).filter(Dish.submenu_id == submenu.id).scalar()
+    dishes_count = session.query(func.count(Dish.submenu_id)).filter(Dish.submenu_id == submenu.id).scalar()
     return {
         "id": submenu.id,
         "title": submenu.title,
@@ -84,7 +93,9 @@ async def get_submenu_by_id(menu_id: str, submenu_id: str, session: Session = De
     }
 
 
-@submenu_router.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Submenus'])
+@submenu_router.patch(
+    '/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    tags=['Submenus'])
 async def update_submenu(
         menu_id: str,
         submenu_id: str,
@@ -110,8 +121,13 @@ async def update_submenu(
     return submenu
 
 
-@submenu_router.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}', tags=['Submenus'])
-async def delete_submenu(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
+@submenu_router.delete(
+    '/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    tags=['Submenus'])
+async def delete_submenu(
+        menu_id: str,
+        submenu_id: str,
+        session: Session = Depends(get_db)):
     submenu = check_submenu_by_menu_id(session, menu_id, submenu_id)
     session.delete(submenu)
     session.commit()

@@ -28,7 +28,11 @@ async def create_menu(
         request: MenuCreateRequest,
         session: Session = Depends(get_db)):
     try:
-        menu = Menu(id=str(uuid4()), title=request.title, description=request.description)
+        menu = Menu(
+            id=str(uuid4()),
+            title=request.title,
+            description=request.description
+        )
     except ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -43,7 +47,11 @@ async def create_menu(
     session.commit()
     session.refresh(menu)
     session.close()
-    return {"id": menu.id, "title": menu.title, "description": menu.description}
+    return {
+        "id": menu.id,
+        "title": menu.title,
+        "description": menu.description
+    }
 
 
 @menu_router.get('/api/v1/menus', tags=['Menus'])
@@ -52,7 +60,7 @@ async def get_menus(session: Session = Depends(get_db)):
     result = []
     for menu in menus:
         submenu_count = session.query(func.count(SubMenu.id)).filter(SubMenu.menu_id == menu.id).scalar()
-        dishes_count = session.query(func.count(Dish.id)).filter(Dish.submenu_id == SubMenu.id).scalar()
+        dishes_count = session.query(func.count(Dish.submenu_id)).filter(Dish.submenu_id == SubMenu.id).scalar()
         data = {
             "id": menu.id,
             "title": menu.title,
@@ -72,12 +80,15 @@ async def get_menu_by_id(menu_id: str, session: Session = Depends(get_db)):
         "title": menu.title,
         "description": menu.description,
         "submenus_count": session.query(func.count(SubMenu.id)).filter(SubMenu.menu_id == menu.id).scalar(),
-        "dishes_count": session.query(func.count(Dish.id)).filter(Dish.submenu_id == SubMenu.id).scalar()
+        "dishes_count": session.query(func.count(Dish.submenu_id)).filter(Dish.submenu_id == SubMenu.id).scalar()
     }
 
 
 @menu_router.patch('/api/v1/menus/{menu_id}', tags=['Menus'])
-async def update_menu(menu_id: str, request: MenuPatchRequest, session: Session = Depends(get_db)):
+async def update_menu(
+        menu_id: str,
+        request: MenuPatchRequest,
+        session: Session = Depends(get_db)):
     menu = check_menu(session, menu_id)
     if request.title:
         menu.title = request.title

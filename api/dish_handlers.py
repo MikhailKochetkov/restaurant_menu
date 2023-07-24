@@ -50,7 +50,9 @@ async def create_dish(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if session.query(Dish).filter_by(title=request.title, submenu_id=submenu_id).first():
+    if session.query(Dish).filter_by(
+            title=request.title,
+            submenu_id=submenu_id).first():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='dish already exists'
@@ -67,14 +69,21 @@ async def create_dish(
     }
 
 
-@dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', tags=['Dishes'])
-async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(get_db)):
+@dish_router.get(
+    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    tags=['Dishes'])
+async def get_dishes(
+        menu_id: str,
+        submenu_id: str,
+        session: Session = Depends(get_db)):
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not session.query(SubMenu).filter_by(id=submenu_id, menu_id=menu_id).first():
+    if not session.query(SubMenu).filter_by(
+            id=submenu_id,
+            menu_id=menu_id).first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
@@ -92,8 +101,14 @@ async def get_dishes(menu_id: str, submenu_id: str, session: Session = Depends(g
     return result
 
 
-@dish_router.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Dishes'])
-async def get_dish_by_id(menu_id: str, submenu_id: str, dish_id: str, session: Session = Depends(get_db)):
+@dish_router.get(
+    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    tags=['Dishes'])
+async def get_dish_by_id(
+        menu_id: str,
+        submenu_id: str,
+        dish_id: str,
+        session: Session = Depends(get_db)):
     dish = check_dish(session, dish_id)
     if not session.query(Menu).filter_by(id=menu_id).first():
         raise HTTPException(
@@ -113,7 +128,9 @@ async def get_dish_by_id(menu_id: str, submenu_id: str, dish_id: str, session: S
     }
 
 
-@dish_router.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Dishes'])
+@dish_router.patch(
+    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    tags=['Dishes'])
 async def update_dish(
         menu_id: str,
         submenu_id: str,
@@ -142,7 +159,9 @@ async def update_dish(
     return dish
 
 
-@dish_router.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', tags=['Dishes'])
+@dish_router.delete(
+    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    tags=['Dishes'])
 async def delete_dish(
         menu_id: str,
         submenu_id: str,
