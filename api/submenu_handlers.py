@@ -14,7 +14,10 @@ from .schemas import (
     SubMenuCreateRequest,
     SubMenuCreateResponse,
     SubMenuPatchRequest)
-from .helpers import check_submenu_by_menu_id
+from .helpers import (
+    check_submenu_by_menu_id,
+    get_first_menu,
+    get_first_submenu)
 
 submenu_router = APIRouter()
 
@@ -39,7 +42,7 @@ async def create_submenu(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='the data are not valid'
         )
-    if not session.query(Menu).filter_by(id=menu_id).first():
+    if not get_first_menu(session, menu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
@@ -105,13 +108,13 @@ async def update_submenu(
         submenu_id: str,
         request: SubMenuPatchRequest,
         session: Session = Depends(get_db)):
-    submenu = session.query(SubMenu).filter_by(id=submenu_id).first()
+    submenu = get_first_submenu(session, submenu_id)
     if not submenu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu not found'
         )
-    if not session.query(Menu).filter_by(id=menu_id).first():
+    if not get_first_menu(session, menu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'

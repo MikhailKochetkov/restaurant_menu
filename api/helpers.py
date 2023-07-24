@@ -2,8 +2,16 @@ from fastapi import HTTPException, status
 from db.models import Menu, SubMenu, Dish
 
 
+def get_first_menu(session, menu_id):
+    return session.query(Menu).filter_by(id=menu_id).first()
+
+
+def get_first_submenu(session, submenu_id):
+    return session.query(SubMenu).filter_by(id=submenu_id).first()
+
+
 def check_menu(session, menu_id):
-    menu = session.query(Menu).filter_by(id=menu_id).first()
+    menu = get_first_menu(session, menu_id)
     if not menu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

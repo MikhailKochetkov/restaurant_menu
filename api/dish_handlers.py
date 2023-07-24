@@ -13,7 +13,10 @@ from .schemas import (
     DishCreateRequest,
     DishCreateResponse,
     DishPatchRequest)
-from .helpers import check_dish
+from .helpers import (
+    check_dish,
+    get_first_menu,
+    get_first_submenu)
 
 dish_router = APIRouter()
 
@@ -40,12 +43,12 @@ async def create_dish(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='the data are not valid'
         )
-    if not session.query(SubMenu).filter_by(id=submenu_id).first():
+    if not get_first_submenu(session, submenu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
         )
-    if not session.query(Menu).filter_by(id=menu_id).first():
+    if not get_first_menu(session, menu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
@@ -76,7 +79,8 @@ async def get_dishes(
         menu_id: str,
         submenu_id: str,
         session: Session = Depends(get_db)):
-    if not session.query(Menu).filter_by(id=menu_id).first():
+    result = []
+    if not get_first_menu(session, menu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
@@ -84,11 +88,12 @@ async def get_dishes(
     if not session.query(SubMenu).filter_by(
             id=submenu_id,
             menu_id=menu_id).first():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='submenu does not exist'
-        )
-    result = []
+        return []
+        # TODO: look at this
+        # raise HTTPException(
+        #     status_code=status.HTTP_404_NOT_FOUND,
+        #     detail='submenu does not exist'
+        # )
     dishes = session.query(Dish).filter_by(submenu_id=submenu_id).all()
     for dish in dishes:
         data = {
@@ -110,12 +115,12 @@ async def get_dish_by_id(
         dish_id: str,
         session: Session = Depends(get_db)):
     dish = check_dish(session, dish_id)
-    if not session.query(Menu).filter_by(id=menu_id).first():
+    if not get_first_menu(session, menu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not session.query(SubMenu).filter_by(id=submenu_id).first():
+    if not get_first_submenu(session, submenu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
@@ -138,12 +143,12 @@ async def update_dish(
         request: DishPatchRequest,
         session: Session = Depends(get_db)):
     dish = check_dish(session, dish_id)
-    if not session.query(Menu).filter_by(id=menu_id).first():
+    if not get_first_menu(session, menu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not session.query(SubMenu).filter_by(id=submenu_id).first():
+    if not get_first_submenu(session, submenu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
@@ -168,12 +173,12 @@ async def delete_dish(
         dish_id: str,
         session: Session = Depends(get_db)):
     dish = check_dish(session, dish_id)
-    if not session.query(Menu).filter_by(id=menu_id).first():
+    if not get_first_menu(session, menu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not session.query(SubMenu).filter_by(id=submenu_id).first():
+    if not get_first_submenu(session, submenu_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
