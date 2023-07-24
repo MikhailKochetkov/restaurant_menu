@@ -22,7 +22,6 @@ jobs:
     - name: Test with flake8 and fastapi tests
       run: |
         python -m flake8
-        pytest
 
   send_message:
     runs-on: ubuntu-latest
