@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from uuid import uuid4
 
-from db.models import Dish, Menu, SubMenu
+from db.models import Dish, SubMenu
 from db.session import get_db
 from .schemas import (
     DishCreateRequest,
