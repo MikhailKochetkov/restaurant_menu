@@ -11,7 +11,11 @@ class Menu(Base):
     id = Column(String, primary_key=True, index=True)
     title = Column(String, unique=True)
     description = Column(String)
-    submenus = relationship('SubMenu', back_populates='menu', cascade='all, delete')
+    submenus = relationship(
+        'SubMenu',
+        back_populates='menu',
+        cascade='all, delete'
+    )
 
 
 class SubMenu(Base):
@@ -22,7 +26,11 @@ class SubMenu(Base):
     description = Column(String)
     menu_id = Column(String, ForeignKey('menus.id'), nullable=False)
     menu = relationship('Menu', back_populates='submenus')
-    dishes = relationship('Dish', back_populates='submenu', cascade='all, delete')
+    dishes = relationship(
+        'Dish',
+        back_populates='submenu',
+        cascade='all, delete'
+    )
 
 
 class Dish(Base):

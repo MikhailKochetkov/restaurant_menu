@@ -7,7 +7,10 @@ from settings import DEV_MODE
 
 
 if DEV_MODE:
-    engine = create_engine(CONNECTION_STRING, connect_args={"check_same_thread": False})
+    engine = create_engine(
+        CONNECTION_STRING,
+        connect_args={"check_same_thread": False}
+    )
     Menu.metadata.create_all(engine)
     SubMenu.metadata.create_all(engine)
     Dish.metadata.create_all(engine)
