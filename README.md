@@ -1,3 +1,5 @@
+![restaurant_menu workflow](https://github.com/MikhailKochetkov/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg?branch=master&event=push)
+
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
