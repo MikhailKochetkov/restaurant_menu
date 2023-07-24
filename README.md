@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 Установить тестовый режим в настройках проекта (файл settings.py):
 ```bash
-TEST_MODE = True
+DEV_MODE = True
 ```
 
 Запустить проект:
@@ -73,7 +73,7 @@ docker container stop <CONTAINER ID>
 
 Отключить тестовый режим в настройках проекта (файл settings.py):
 ```bash
-TEST_MODE = False
+DEV_MODE = False
 ```
 
 Собрать контейнеры:
