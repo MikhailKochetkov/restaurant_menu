@@ -69,14 +69,13 @@ async def get_menus(session: Session = Depends(get_db)):
     ).outerjoin(SubMenu, SubMenu.menu_id == Menu.id).outerjoin(
         sub_query, Menu.id == sub_query.c.menu_id
     ).group_by(Menu.id).all()
-    result = [{
+    return [{
         "id": q[0].id,
         "title": q[0].title,
         "description": q[0].description,
         "submenus_count": q[1],
         "dishes_count": q[2]
     } for q in query]
-    return result
 
 
 @menu_router.get('/api/v1/menus/{menu_id}', tags=['Menus'])
