@@ -63,9 +63,9 @@ async def get_menus(session: Session = Depends(get_db)):
         Dish, Dish.submenu_id == SubMenu.id).group_by(SubMenu.menu_id).subquery()
     query = session.query(
         Menu,
-        func.count(SubMenu.id),
-        sub_query.c.total_dishes
-    ).join(SubMenu, SubMenu.menu_id == Menu.id).join(
+        func.coalesce(func.count(SubMenu.id), 0),
+        func.coalesce(sub_query.c.total_dishes, 0)
+    ).outerjoin(SubMenu, SubMenu.menu_id == Menu.id).outerjoin(
         sub_query, Menu.id == sub_query.c.menu_id
     ).group_by(Menu.id).all()
     result = [{
@@ -88,27 +88,25 @@ async def get_menu_by_id(menu_id: str, session: Session = Depends(get_db)):
         SubMenu.menu_id).subquery()
     query = session.query(
         Menu,
-        func.count(SubMenu.id),
-        sub_query.c.total_dishes
-    ).filter_by(id=menu_id).join(
+        func.coalesce(func.count(SubMenu.id), 0),
+        func.coalesce(sub_query.c.total_dishes, 0)
+    ).filter_by(id=menu_id).outerjoin(
         SubMenu, SubMenu.menu_id == Menu.id
-    ).join(
+    ).outerjoin(
         sub_query, Menu.id == sub_query.c.menu_id
     ).group_by(Menu.id).first()
-    if query:
-        result = {
-            "id": query[0].id,
-            "title": query[0].title,
-            "description": query[0].description,
-            "submenus_count": query[1],
-            "dishes_count": query[2]
-        }
-        return result
-    else:
+    if not query:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="menu not found"
         )
+    return {
+        "id": query[0].id,
+        "title": query[0].title,
+        "description": query[0].description,
+        "submenus_count": query[1],
+        "dishes_count": query[2]
+    }
 
 
 @menu_router.patch('/api/v1/menus/{menu_id}', tags=['Menus'])
