@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from uuid import uuid4
 
-from db.models import Menu, SubMenu, Dish
+from db.models import Menu, SubMenu
 from db.session import get_db
 from .schemas import (
     MenuCreateRequest,
