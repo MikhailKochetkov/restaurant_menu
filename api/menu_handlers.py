@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from uuid import uuid4
 
-from db.models import Menu, SubMenu
+from db.models import Menu, SubMenu, Dish
 from db.session import get_db
 from .schemas import (
     MenuCreateRequest,
@@ -56,6 +56,7 @@ async def create_menu(
 
 @menu_router.get('/api/v1/menus', tags=['Menus'])
 async def get_menus(session: Session = Depends(get_db)):
+    # TODO: тут нужно поправить dishes_count
     menus = session.query(Menu).all()
     result = []
     for menu in menus:
@@ -76,6 +77,7 @@ async def get_menus(session: Session = Depends(get_db)):
 
 @menu_router.get('/api/v1/menus/{menu_id}', tags=['Menus'])
 async def get_menu_by_id(menu_id: str, session: Session = Depends(get_db)):
+    # TODO: тут нужно поправить dishes_count
     menu = check_menu(session, menu_id)
     return {
         "id": menu.id,
