@@ -60,7 +60,8 @@ async def get_menus(session: Session = Depends(get_db)):
         SubMenu.menu_id,
         func.count(Dish.id).label('total_dishes')
     ).join(
-        Dish, Dish.submenu_id == SubMenu.id).group_by(SubMenu.menu_id).subquery()
+        Dish, Dish.submenu_id == SubMenu.id
+    ).group_by(SubMenu.menu_id).subquery()
     query = session.query(
         Menu,
         func.coalesce(func.count(SubMenu.id), 0),
@@ -74,7 +75,6 @@ async def get_menus(session: Session = Depends(get_db)):
         "description": q[0].description,
         "submenus_count": q[1],
         "dishes_count": q[2]
-
     } for q in query]
     return result
 
