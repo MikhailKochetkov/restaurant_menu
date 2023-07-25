@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from uuid import uuid4
 
-from db.models import Menu, SubMenu
+from db.models import Menu, SubMenu, Dish
 from db.session import get_db
 from .schemas import (
     MenuCreateRequest,
@@ -56,40 +56,59 @@ async def create_menu(
 
 @menu_router.get('/api/v1/menus', tags=['Menus'])
 async def get_menus(session: Session = Depends(get_db)):
-    # TODO: тут нужно поправить dishes_count
-    menus = session.query(Menu).all()
-    result = []
-    for menu in menus:
-        submenu_count = session.query(
-            func.count(SubMenu.id)
-        ).filter(SubMenu.menu_id == menu.id).scalar()
-        dishes_count = sum(len(submenu.dishes) for submenu in menu.submenus)
-        data = {
-            "id": menu.id,
-            "title": menu.title,
-            "description": menu.description,
-            "submenus_count": submenu_count,
-            "dishes_count": dishes_count
-        }
-        result.append(data)
+    sub_query = session.query(
+        SubMenu.menu_id,
+        func.count(Dish.id).label('total_dishes')
+    ).join(
+        Dish, Dish.submenu_id == SubMenu.id).group_by(SubMenu.menu_id).subquery()
+    query = session.query(
+        Menu,
+        func.count(SubMenu.id),
+        sub_query.c.total_dishes
+    ).join(SubMenu, SubMenu.menu_id == Menu.id).join(
+        sub_query, Menu.id == sub_query.c.menu_id
+    ).group_by(Menu.id).all()
+    result = [{
+        "id": q[0].id,
+        "title": q[0].title,
+        "description": q[0].description,
+        "submenus_count": q[1],
+        "dishes_count": q[2]
+
+    } for q in query]
     return result
 
 
 @menu_router.get('/api/v1/menus/{menu_id}', tags=['Menus'])
 async def get_menu_by_id(menu_id: str, session: Session = Depends(get_db)):
-    # TODO: тут нужно поправить dishes_count
-    menu = check_menu(session, menu_id)
-    return {
-        "id": menu.id,
-        "title": menu.title,
-        "description": menu.description,
-        "submenus_count": session.query(
-            func.count(SubMenu.id)
-        ).filter(SubMenu.menu_id == menu.id).scalar(),
-        "dishes_count": sum(
-            len(submenu.dishes) for submenu in menu.submenus
+    sub_query = session.query(
+        SubMenu.menu_id,
+        func.count(Dish.id).label('total_dishes')
+    ).join(Dish, Dish.submenu_id == SubMenu.id).group_by(
+        SubMenu.menu_id).subquery()
+    query = session.query(
+        Menu,
+        func.count(SubMenu.id),
+        sub_query.c.total_dishes
+    ).filter_by(id=menu_id).join(
+        SubMenu, SubMenu.menu_id == Menu.id
+    ).join(
+        sub_query, Menu.id == sub_query.c.menu_id
+    ).group_by(Menu.id).first()
+    if query:
+        result = {
+            "id": query[0].id,
+            "title": query[0].title,
+            "description": query[0].description,
+            "submenus_count": query[1],
+            "dishes_count": query[2]
+        }
+        return result
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="menu not found"
         )
-    }
 
 
 @menu_router.patch('/api/v1/menus/{menu_id}', tags=['Menus'])
