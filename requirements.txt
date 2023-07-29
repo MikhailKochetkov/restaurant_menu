@@ -4,3 +4,7 @@ uvicorn
 pydantic
 python-dotenv
 psycopg2-binary
+pytest
+httpx
+sqlalchemy[asyncio]
+asyncpg
