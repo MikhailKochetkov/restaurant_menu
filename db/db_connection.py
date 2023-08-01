@@ -7,7 +7,7 @@ load_dotenv()
 CONNECTION_STRING = (f'{os.getenv("DATABASE_URL", default="sqlite:///")}'
                      f'./{os.getenv("DB_NAME", default="database.db")}')
 
-PG_CONNECTION_STRING = (f'{os.getenv("PG_DB_URL", default="postgresql://")}'
+PG_CONNECTION_STRING = (f'{os.getenv("PG_DB_URL", default="postgresql+asyncpg://")}'
                         f'{os.getenv("POSTGRES_USER", default="postgres")}:'
                         f'{os.getenv("POSTGRES_PASSWORD", default="postgres")}'
                         f'@'
