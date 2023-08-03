@@ -4,11 +4,12 @@ from fastapi import (
     HTTPException,
     status)
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import func, select
 from uuid import uuid4
 
-from db.models import Dish, SubMenu
-from db.session import get_db
+from db.models import Dish, SubMenu, Menu
+from db.session import get_session
 from .schemas import (
     DishCreateRequest,
     DishCreateResponse,
@@ -30,7 +31,7 @@ async def create_dish(
         menu_id: str,
         submenu_id: str,
         request: DishCreateRequest,
-        session: Session = Depends(get_db)):
+        session: AsyncSession = Depends(get_session)):
     try:
         dish = Dish(
             id=str(uuid4()),
@@ -43,27 +44,34 @@ async def create_dish(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='the data are not valid'
         )
-    if not get_first_submenu(session, submenu_id):
+    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    if not submenu_result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
         )
-    if not get_first_menu(session, menu_id):
+    menu_result = await session.execute(select(Menu).filter_by(id=menu_id))
+    if not menu_result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if session.query(Dish).filter_by(
+    dish_result = await session.execute(
+        select(Dish)
+        .filter_by(
             title=request.title,
-            submenu_id=submenu_id).first():
+            submenu_id=submenu_id
+        )
+    )
+    if dish_result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='dish already exists'
         )
     session.add(dish)
-    session.commit()
-    session.refresh(dish)
-    session.close()
+    await session.commit()
+    await session.refresh(dish)
+    await session.close()
     return {
         "id": dish.id,
         "title": dish.title,
@@ -78,7 +86,7 @@ async def create_dish(
 async def get_dishes(
         menu_id: str,
         submenu_id: str,
-        session: Session = Depends(get_db)):
+        session: AsyncSession = Depends(get_session)):
     result = []
     if not get_first_menu(session, menu_id):
         raise HTTPException(
@@ -108,7 +116,7 @@ async def get_dish_by_id(
         menu_id: str,
         submenu_id: str,
         dish_id: str,
-        session: Session = Depends(get_db)):
+        session: AsyncSession = Depends(get_session)):
     dish = check_dish(session, dish_id)
     if not get_first_menu(session, menu_id):
         raise HTTPException(
@@ -136,7 +144,7 @@ async def update_dish(
         submenu_id: str,
         dish_id: str,
         request: DishPatchRequest,
-        session: Session = Depends(get_db)):
+        session: AsyncSession = Depends(get_session)):
     dish = check_dish(session, dish_id)
     if not get_first_menu(session, menu_id):
         raise HTTPException(
@@ -154,8 +162,8 @@ async def update_dish(
         dish.description = request.description
     if request.price:
         dish.price = request.price
-    session.commit()
-    session.refresh(dish)
+    await session.commit()
+    await session.refresh(dish)
     return dish
 
 
@@ -166,7 +174,7 @@ async def delete_dish(
         menu_id: str,
         submenu_id: str,
         dish_id: str,
-        session: Session = Depends(get_db)):
+        session: AsyncSession = Depends(get_session)):
     dish = check_dish(session, dish_id)
     if not get_first_menu(session, menu_id):
         raise HTTPException(
@@ -178,6 +186,6 @@ async def delete_dish(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
         )
-    session.delete(dish)
-    session.commit()
+    await session.delete(dish)
+    await session.commit()
     return {"message": "dish deleted successfully"}
