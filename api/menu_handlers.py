@@ -56,7 +56,6 @@ async def create_menu(
 
 @menu_router.get('/api/v1/menus', tags=['Menus'])
 async def get_menus(session: AsyncSession = Depends(get_session)):
-    # TODO: 1 check for errors
     sub_query = select(
         SubMenu.menu_id,
         func.count(Dish.id).label('total_dishes')
@@ -84,7 +83,6 @@ async def get_menus(session: AsyncSession = Depends(get_session)):
 
 @menu_router.get('/api/v1/menus/{menu_id}', tags=['Menus'])
 async def get_menu_by_id(menu_id: str, session: AsyncSession = Depends(get_session)):
-    # TODO: 2 check for errors
     sub_query = select(
         SubMenu.menu_id,
         func.count(Dish.id).label('total_dishes')
