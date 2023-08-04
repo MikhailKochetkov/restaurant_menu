@@ -15,7 +15,7 @@ main_router.include_router(submenu_router)
 main_router.include_router(dish_router)
 app.include_router(main_router)
 
-if not DEV_MODE:
+if DEV_MODE:
     from db.session import create_tables
 
     asyncio.create_task(create_tables())
