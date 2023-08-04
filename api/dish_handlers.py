@@ -14,10 +14,6 @@ from .schemas import (
     DishCreateRequest,
     DishCreateResponse,
     DishPatchRequest)
-from .helpers import (
-    check_dish,
-    get_first_menu,
-    get_first_submenu)
 
 dish_router = APIRouter()
 
@@ -56,18 +52,6 @@ async def create_dish(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    dish_result = await session.execute(
-        select(Dish)
-        .filter_by(
-            title=request.title,
-            submenu_id=submenu_id
-        )
-    )
-    if dish_result.scalar_one_or_none():
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail='dish already exists'
-        )
     session.add(dish)
     await session.commit()
     await session.refresh(dish)
@@ -88,22 +72,25 @@ async def get_dishes(
         submenu_id: str,
         session: AsyncSession = Depends(get_session)):
     result = []
-    if not get_first_menu(session, menu_id):
+    menu_result = await session.execute(select(Menu).filter_by(id=menu_id))
+    menu = menu_result.scalar_one_or_none()
+    if not menu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not session.query(SubMenu).filter_by(
+    submenu_result = await session.execute(select(SubMenu).filter_by(
             id=submenu_id,
-            menu_id=menu_id).first():
+            menu_id=menu_id))
+    if not submenu_result.scalar_one_or_none():
         return []
-    dishes = session.query(Dish).filter_by(submenu_id=submenu_id).all()
-    for dish in dishes:
+    dishes_result = await session.execute(select(Dish).filter_by(submenu_id=submenu_id))
+    for dish in dishes_result:
         data = {
-            "id": dish.id,
-            "title": dish.title,
-            "description": dish.description,
-            "price": dish.price
+            "id": dish[0].id,
+            "title": dish[0].title,
+            "description": dish[0].description,
+            "price": dish[0].price
         }
         result.append(data)
     return result
@@ -117,13 +104,23 @@ async def get_dish_by_id(
         submenu_id: str,
         dish_id: str,
         session: AsyncSession = Depends(get_session)):
-    dish = check_dish(session, dish_id)
-    if not get_first_menu(session, menu_id):
+    dish_result = await session.execute(select(Dish).filter_by(id=dish_id))
+    dish = dish_result.scalar_one_or_none()
+    if not dish:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='dish not found'
+        )
+    menu_result = await session.execute(select(Menu).filter_by(id=menu_id))
+    menu = menu_result.scalar_one_or_none()
+    if not menu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not get_first_submenu(session, submenu_id):
+    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    submenu = submenu_result.scalar_one_or_none()
+    if not submenu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
@@ -145,13 +142,23 @@ async def update_dish(
         dish_id: str,
         request: DishPatchRequest,
         session: AsyncSession = Depends(get_session)):
-    dish = check_dish(session, dish_id)
-    if not get_first_menu(session, menu_id):
+    dish_result = await session.execute(select(Dish).filter_by(id=dish_id))
+    dish = dish_result.scalar_one_or_none()
+    if not dish:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='dish not found'
+        )
+    menu_result = await session.execute(select(Menu).filter_by(id=menu_id))
+    menu = menu_result.scalar_one_or_none()
+    if not menu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not get_first_submenu(session, submenu_id):
+    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    submenu = submenu_result.scalar_one_or_none()
+    if not submenu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
@@ -161,7 +168,7 @@ async def update_dish(
     if request.description:
         dish.description = request.description
     if request.price:
-        dish.price = request.price
+        dish.price = str(round(request.price, 2))
     await session.commit()
     await session.refresh(dish)
     return dish
@@ -175,13 +182,23 @@ async def delete_dish(
         submenu_id: str,
         dish_id: str,
         session: AsyncSession = Depends(get_session)):
-    dish = check_dish(session, dish_id)
-    if not get_first_menu(session, menu_id):
+    dish_result = await session.execute(select(Dish).filter_by(id=dish_id))
+    dish = dish_result.scalar_one_or_none()
+    if not dish:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='dish not found'
+        )
+    menu_result = await session.execute(select(Menu).filter_by(id=menu_id))
+    menu = menu_result.scalar_one_or_none()
+    if not menu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if not get_first_submenu(session, submenu_id):
+    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    submenu = submenu_result.scalar_one_or_none()
+    if not submenu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu does not exist'
