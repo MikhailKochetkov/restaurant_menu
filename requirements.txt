@@ -8,3 +8,6 @@ pytest
 httpx
 sqlalchemy[asyncio]
 asyncpg
+pytest-asyncio
+alembic
+asgiref
