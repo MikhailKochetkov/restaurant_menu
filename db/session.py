@@ -1,5 +1,4 @@
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
 from .models import Menu, SubMenu, Dish
 from .db_connection import PG_CONNECTION_STRING
@@ -8,7 +7,7 @@ from settings import DEV_MODE
 
 if DEV_MODE:
     engine = create_async_engine(PG_CONNECTION_STRING, future=True)
-    async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
     async def create_tables():
         async with engine.begin() as conn:
