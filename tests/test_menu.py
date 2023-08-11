@@ -1,16 +1,17 @@
+import pytest
+
 from fastapi import status
-from fastapi.testclient import TestClient
 
-from main import app
-from db.session import get_db
-from db.models import Menu
-
-client = TestClient(app)
-request_data = {"title": "test menu", "description": "test menu description"}
+from .conftest import client
 
 
-def test_create_menu():
-    response = client.post('/api/v1/menus', json=request_data)
+@pytest.mark.asyncio
+async def test_create_menu(client):
+    menu_data = {
+        "title": "test menu",
+        "description": "test menu description"
+    }
+    response = await client.post('/api/v1/menus', json=menu_data)
     assert response.status_code == status.HTTP_201_CREATED
     assert 'id' in response.json()
     assert 'title' in response.json()
@@ -18,37 +19,39 @@ def test_create_menu():
     assert response.json()['title'] == 'test menu'
     assert response.json()['description'] == 'test menu description'
 
-
-def test_create_menu_fail():
-    response = client.post('/api/v1/menus', json=request_data)
+    response = await client.post('/api/v1/menus', json=menu_data)
     assert response.status_code == status.HTTP_409_CONFLICT
+    assert response.json()["detail"] == "menu already exists"
 
 
-def test_get_menus():
-    response = client.get('/api/v1/menus')
+@pytest.mark.asyncio
+async def test_get_menus(client):
+    response = await client.get('/api/v1/menus')
     assert response.status_code == status.HTTP_200_OK
 
 
-def test_get_menu_by_id():
-    menu_id = "test_menu_id"
-    title = "Test Menu"
-    description = "This is a test menu"
-    gd = get_db()
-    db = next(gd)
-    menu = Menu(id=menu_id, title=title, description=description)
-    db.add(menu)
-    db.commit()
-    response = client.get(f'/api/v1/menus/{menu_id}')
-    data = response.json()
-    assert response.status_code == status.HTTP_200_OK
+@pytest.mark.asyncio
+async def test_get_menu_by_id(client):
+    menu_data = {
+        "title": "new test menu",
+        "description": "new test menu description"
+    }
+    post_response = await client.post('/api/v1/menus', json=menu_data)
+
+    menu_id = post_response.json()["id"]
+    get_response = await client.get(f'/api/v1/menus/{menu_id}')
+    data = get_response.json()
+    assert get_response.status_code == status.HTTP_200_OK
     assert data["id"] == menu_id
-    assert data["title"] == title
-    assert data["description"] == description
+    assert data["title"] == menu_data["title"]
+    assert data["description"] == menu_data["description"]
 #
 #
-# def test_update_menu():
+# @pytest.mark.asyncio
+# async def test_update_menu(client):
 #     pass
 #
 #
-# def test_delete_menu():
+# @pytest.mark.asyncio
+# async def test_delete_menu(client):
 #     pass
