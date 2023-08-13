@@ -3,14 +3,12 @@ import pytest
 from fastapi import status
 
 from .conftest import client
+from .helpers import create_unique_menu
 
 
 @pytest.mark.asyncio
 async def test_create_menu(client):
-    menu = {
-        "title": "test menu 1",
-        "description": "test menu description 1"
-    }
+    menu = create_unique_menu()
     response = await client.post('/api/v1/menus', json=menu)
     menu_data = response.json()
     assert response.status_code == status.HTTP_201_CREATED
@@ -33,10 +31,7 @@ async def test_get_menus(client):
 
 @pytest.mark.asyncio
 async def test_get_menu_by_id(client):
-    menu = {
-        "title": "test menu 2",
-        "description": "test menu description 2"
-    }
+    menu = create_unique_menu()
     post_response = await client.post('/api/v1/menus', json=menu)
     menu_id = post_response.json()["id"]
     get_response = await client.get(f'/api/v1/menus/{menu_id}')
@@ -49,13 +44,10 @@ async def test_get_menu_by_id(client):
 
 @pytest.mark.asyncio
 async def test_update_menu(client):
-    menu = {
-        "title": "test menu 3",
-        "description": "test menu description 3"
-    }
+    menu = create_unique_menu()
     upd_menu = {
-        "title": "updated test menu 3",
-        "description": "updated test menu description 3"
+        "title": "updated test menu",
+        "description": "updated test menu description"
     }
     post_response = await client.post('/api/v1/menus', json=menu)
     menu_id = post_response.json()["id"]
@@ -72,10 +64,7 @@ async def test_update_menu(client):
 
 @pytest.mark.asyncio
 async def test_delete_menu(client):
-    menu = {
-        "title": "test menu 4",
-        "description": "test menu description 4"
-    }
+    menu = create_unique_menu()
     post_response = await client.post('/api/v1/menus', json=menu)
     menu_id = post_response.json()["id"]
     del_response = await client.delete(f'/api/v1/menus/{menu_id}')

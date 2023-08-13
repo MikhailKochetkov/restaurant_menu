@@ -3,21 +3,17 @@ import pytest
 from fastapi import status
 
 from .conftest import client
+from .helpers import (
+    create_unique_menu,
+    create_unique_submenu)
 
 
 @pytest.mark.asyncio
 async def test_create_submenu(client):
-    menu = {
-        "title": "test menu 5",
-        "description": "test menu description 5"
-    }
+    menu = create_unique_menu()
     menu_response = await client.post('/api/v1/menus', json=menu)
     menu_id = menu_response.json()["id"]
-    submenu = {
-        "title": "test submenu 5",
-        "description": "test submenu description 5",
-        "menu_id": f"{menu_id}"
-    }
+    submenu = create_unique_submenu(menu_id)
     submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
     submenu_data = submenu_response.json()
     assert submenu_response.status_code == status.HTTP_201_CREATED
@@ -27,28 +23,17 @@ async def test_create_submenu(client):
     assert submenu_data['title'] == submenu["title"]
     assert submenu_data['description'] == submenu["description"]
     menu_id = "1aa-2bb"
-    submenu = {
-        "title": "test submenu 6",
-        "description": "test submenu description 6",
-        "menu_id": f"{menu_id}"
-    }
+    submenu = create_unique_submenu(menu_id)
     submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
     assert submenu_response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.asyncio
 async def test_get_submenus(client):
-    menu = {
-        "title": "test menu 6",
-        "description": "test menu description 6"
-    }
+    menu = create_unique_menu()
     menu_response = await client.post('/api/v1/menus', json=menu)
     menu_id = menu_response.json()["id"]
-    submenu = {
-        "title": "test submenu 5",
-        "description": "test submenu description 5",
-        "menu_id": f"{menu_id}"
-    }
+    submenu = create_unique_submenu(menu_id)
     submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
     get_submenu_response = await client.get(f'/api/v1/menus/{menu_id}/submenus')
     assert get_submenu_response.status_code == status.HTTP_200_OK
@@ -59,17 +44,10 @@ async def test_get_submenus(client):
 
 @pytest.mark.asyncio
 async def test_get_submenu_by_id(client):
-    menu = {
-        "title": "test menu 7",
-        "description": "test menu description 7"
-    }
+    menu = create_unique_menu()
     menu_response = await client.post('/api/v1/menus', json=menu)
     menu_id = menu_response.json()["id"]
-    submenu = {
-        "title": "test submenu 7",
-        "description": "test submenu description 7",
-        "menu_id": f"{menu_id}"
-    }
+    submenu = create_unique_submenu(menu_id)
     submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
     submenu_id = submenu_response.json()["id"]
     get_submenu_response = await client.get(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}')
