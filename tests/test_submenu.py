@@ -57,10 +57,26 @@ async def test_get_submenus(client):
     assert get_submenu_response.json()[0]["description"] == submenu_response.json()["description"]
 
 
-@pytest.mark.skip(reason='no way of currently testing this')
 @pytest.mark.asyncio
 async def test_get_submenu_by_id(client):
-    pass
+    menu = {
+        "title": "test menu 7",
+        "description": "test menu description 7"
+    }
+    menu_response = await client.post('/api/v1/menus', json=menu)
+    menu_id = menu_response.json()["id"]
+    submenu = {
+        "title": "test submenu 7",
+        "description": "test submenu description 7",
+        "menu_id": f"{menu_id}"
+    }
+    submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
+    submenu_id = submenu_response.json()["id"]
+    get_submenu_response = await client.get(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}')
+    assert get_submenu_response.status_code == status.HTTP_200_OK
+    assert get_submenu_response.json()["id"] == submenu_response.json()["id"]
+    assert get_submenu_response.json()["title"] == submenu_response.json()["title"]
+    assert get_submenu_response.json()["description"] == submenu_response.json()["description"]
 
 
 @pytest.mark.skip(reason='no way of currently testing this')
