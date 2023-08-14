@@ -67,7 +67,9 @@ async def test_get_dishes(client):
         json=dish
     )
     dish_data = dish_response.json()
-    get_dish_response = await client.get(f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}/dishes')
+    get_dish_response = await client.get(
+        f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}/dishes'
+    )
     assert get_dish_response.status_code == status.HTTP_200_OK
     assert get_dish_response.json()[0]["id"] == dish_data["id"]
     assert get_dish_response.json()[0]["title"] == dish_data["title"]

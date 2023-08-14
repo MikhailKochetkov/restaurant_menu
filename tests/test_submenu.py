@@ -14,7 +14,10 @@ async def test_create_submenu(client):
     menu_response = await client.post('/api/v1/menus', json=menu)
     menu_id = menu_response.json()["id"]
     submenu = create_unique_submenu(menu_id)
-    submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
+    submenu_response = await client.post(
+        f'/api/v1/menus/{menu_id}/submenus',
+        json=submenu
+    )
     submenu_data = submenu_response.json()
     assert submenu_response.status_code == status.HTTP_201_CREATED
     assert 'id' in submenu_data
@@ -24,7 +27,10 @@ async def test_create_submenu(client):
     assert submenu_data['description'] == submenu["description"]
     menu_id = "1aa-2bb"
     submenu = create_unique_submenu(menu_id)
-    submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
+    submenu_response = await client.post(
+        f'/api/v1/menus/{menu_id}/submenus',
+        json=submenu
+    )
     assert submenu_response.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -34,12 +40,17 @@ async def test_get_submenus(client):
     menu_response = await client.post('/api/v1/menus', json=menu)
     menu_id = menu_response.json()["id"]
     submenu = create_unique_submenu(menu_id)
-    submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
+    submenu_response = await client.post(
+        f'/api/v1/menus/{menu_id}/submenus',
+        json=submenu
+    )
+    post_resp_data = submenu_response.json()
     get_submenu_response = await client.get(f'/api/v1/menus/{menu_id}/submenus')
+    get_resp_data = get_submenu_response.json()[0]
     assert get_submenu_response.status_code == status.HTTP_200_OK
-    assert get_submenu_response.json()[0]["id"] == submenu_response.json()["id"]
-    assert get_submenu_response.json()[0]["title"] == submenu_response.json()["title"]
-    assert get_submenu_response.json()[0]["description"] == submenu_response.json()["description"]
+    assert get_resp_data["id"] == post_resp_data["id"]
+    assert get_resp_data["title"] == post_resp_data["title"]
+    assert get_resp_data["description"] == post_resp_data["description"]
 
 
 @pytest.mark.asyncio
@@ -48,16 +59,25 @@ async def test_get_submenu_by_id(client):
     menu_response = await client.post('/api/v1/menus', json=menu)
     menu_id = menu_response.json()["id"]
     submenu = create_unique_submenu(menu_id)
-    submenu_response = await client.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu)
+    submenu_response = await client.post(
+        f'/api/v1/menus/{menu_id}/submenus',
+        json=submenu
+    )
+    post_resp_data = submenu_response.json()
     submenu_id = submenu_response.json()["id"]
-    get_submenu_response = await client.get(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}')
+    get_submenu_response = await client.get(
+        f'/api/v1/menus/{menu_id}/submenus/{submenu_id}'
+    )
+    get_resp_data = get_submenu_response.json()
     assert get_submenu_response.status_code == status.HTTP_200_OK
-    assert get_submenu_response.json()["id"] == submenu_response.json()["id"]
-    assert get_submenu_response.json()["title"] == submenu_response.json()["title"]
-    assert get_submenu_response.json()["description"] == submenu_response.json()["description"]
+    assert get_resp_data["id"] == post_resp_data["id"]
+    assert get_resp_data["title"] == post_resp_data["title"]
+    assert get_resp_data["description"] == post_resp_data["description"]
     menu_id = "2aa-3bb"
     submenu_id = "4cc-5dd"
-    get_submenu_response = await client.get(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}')
+    get_submenu_response = await client.get(
+        f'/api/v1/menus/{menu_id}/submenus/{submenu_id}'
+    )
     assert get_submenu_response.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -114,9 +134,13 @@ async def test_delete_submenu(client):
         json=submenu
     )
     real_submenu_id = submenu_response.json()["id"]
-    del_response = await client.delete(f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}')
+    del_response = await client.delete(
+        f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}'
+    )
     assert del_response.json()["message"] == "submenu deleted successfully"
     submenu_id = "23-yy-99"
-    del_response = await client.delete(f'/api/v1/menus/{real_menu_id}/submenus/{submenu_id}')
+    del_response = await client.delete(
+        f'/api/v1/menus/{real_menu_id}/submenus/{submenu_id}'
+    )
     assert del_response.status_code == status.HTTP_404_NOT_FOUND
     assert del_response.json()["detail"] == "submenu not found"
