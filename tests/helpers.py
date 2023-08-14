@@ -1,11 +1,11 @@
-import uuid
 import time
 
+from uuid import uuid4
 from random import uniform
 
 
 def create_unique_menu():
-    unique_id = str(uuid.uuid4())
+    unique_id = str(uuid4())
     timestamp = str(time.time())
     menu = {
         "title": f"test menu title  {unique_id}",
@@ -15,7 +15,7 @@ def create_unique_menu():
 
 
 def create_unique_submenu(menu_id):
-    unique_id = str(uuid.uuid4())
+    unique_id = str(uuid4())
     timestamp = str(time.time())
     submenu = {
         "title": f"test submenu title {unique_id}",
@@ -26,7 +26,7 @@ def create_unique_submenu(menu_id):
 
 
 def create_unique_dish(submenu_id):
-    unique_id = str(uuid.uuid4())
+    unique_id = str(uuid4())
     timestamp = str(time.time())
     price = round(uniform(1, 10), 2)
     dish = {
