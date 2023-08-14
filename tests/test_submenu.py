@@ -32,6 +32,7 @@ async def test_create_submenu(client):
         json=submenu
     )
     assert submenu_response.status_code == status.HTTP_404_NOT_FOUND
+    assert submenu_response.json()["detail"] == "menu does not exist"
 
 
 @pytest.mark.asyncio
@@ -45,7 +46,9 @@ async def test_get_submenus(client):
         json=submenu
     )
     post_resp_data = submenu_response.json()
-    get_submenu_response = await client.get(f'/api/v1/menus/{menu_id}/submenus')
+    get_submenu_response = await client.get(
+        f'/api/v1/menus/{menu_id}/submenus'
+    )
     get_resp_data = get_submenu_response.json()[0]
     assert get_submenu_response.status_code == status.HTTP_200_OK
     assert get_resp_data["id"] == post_resp_data["id"]
@@ -57,28 +60,28 @@ async def test_get_submenus(client):
 async def test_get_submenu_by_id(client):
     menu = create_unique_menu()
     menu_response = await client.post('/api/v1/menus', json=menu)
-    menu_id = menu_response.json()["id"]
-    submenu = create_unique_submenu(menu_id)
+    real_menu_id = menu_response.json()["id"]
+    submenu = create_unique_submenu(real_menu_id)
     submenu_response = await client.post(
-        f'/api/v1/menus/{menu_id}/submenus',
+        f'/api/v1/menus/{real_menu_id}/submenus',
         json=submenu
     )
     post_resp_data = submenu_response.json()
-    submenu_id = submenu_response.json()["id"]
-    get_submenu_response = await client.get(
-        f'/api/v1/menus/{menu_id}/submenus/{submenu_id}'
+    real_submenu_id = submenu_response.json()["id"]
+    get_response = await client.get(
+        f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}'
     )
-    get_resp_data = get_submenu_response.json()
-    assert get_submenu_response.status_code == status.HTTP_200_OK
+    get_resp_data = get_response.json()
+    assert get_response.status_code == status.HTTP_200_OK
     assert get_resp_data["id"] == post_resp_data["id"]
     assert get_resp_data["title"] == post_resp_data["title"]
     assert get_resp_data["description"] == post_resp_data["description"]
-    menu_id = "2aa-3bb"
     submenu_id = "4cc-5dd"
-    get_submenu_response = await client.get(
-        f'/api/v1/menus/{menu_id}/submenus/{submenu_id}'
+    get_response = await client.get(
+        f'/api/v1/menus/{real_menu_id}/submenus/{submenu_id}'
     )
-    assert get_submenu_response.status_code == status.HTTP_404_NOT_FOUND
+    assert get_response.status_code == status.HTTP_404_NOT_FOUND
+    assert get_response.json()["detail"] == "submenu not found"
 
 
 @pytest.mark.asyncio
