@@ -66,18 +66,21 @@ async def test_get_dishes(client):
         f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}/dishes',
         json=dish
     )
-    dish_data = dish_response.json()
+    post_resp_data = dish_response.json()
     get_dish_response = await client.get(
         f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}/dishes'
     )
+    get_resp_data = get_dish_response.json()[0]
     assert get_dish_response.status_code == status.HTTP_200_OK
-    assert get_dish_response.json()[0]["id"] == dish_data["id"]
-    assert get_dish_response.json()[0]["title"] == dish_data["title"]
-    assert get_dish_response.json()[0]["description"] == dish_data["description"]
-    assert get_dish_response.json()[0]["price"] == str(dish_data["price"])
+    assert get_resp_data["id"] == post_resp_data["id"]
+    assert get_resp_data["title"] == post_resp_data["title"]
+    assert get_resp_data["description"] == post_resp_data["description"]
+    assert get_resp_data["price"] == str(post_resp_data["price"])
     menu_id = "77-dd-00"
     submenu_id = real_submenu_id
-    get_dish_response = await client.get(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes')
+    get_dish_response = await client.get(
+        f'/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes'
+    )
     assert get_dish_response.status_code == status.HTTP_404_NOT_FOUND
     assert get_dish_response.json()["detail"] == "menu does not exist"
 
