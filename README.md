@@ -66,18 +66,6 @@ DB_HOST=db
 docker-compose up -d --build
 ```
 
-Создать миграции (если необходимо)
-
-```bash
-docker-compose exec app alembic revision --autogenerate -m 'short description of migration'
-```
-
-Выполнить миграции
-
-```bash
-docker-compose exec app alembic upgrade head
-```
-
 Остановить контейнеры
 ```bash
 docker-compose stop
