@@ -10,7 +10,9 @@ services:
       - .env
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: uvicorn main:app --host 0.0.0.0
     ports:
       - "8000:8000"
@@ -21,6 +23,10 @@ services:
       - PYTHONUNBUFFERED=1
     env_file:
       - .env
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
 
 volumes:
   database:
