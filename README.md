@@ -38,7 +38,7 @@ pip install -r requirements.txt
 alembic revision --autogenerate -m 'short description of migration'
 ```
 
-Выполнить миграции
+Выполнить миграции (если необходимо)
 
 ```bash
 alembic upgrade head
@@ -64,6 +64,18 @@ DB_HOST=db
 Собрать контейнеры
 ```bash
 docker-compose up -d --build
+```
+
+Создать миграции (если необходимо)
+
+```bash
+docker-compose exec app alembic revision --autogenerate -m 'short description of migration'
+```
+
+Выполнить миграции (если необходимо)
+
+```bash
+docker-compose exec app alembic upgrade head
 ```
 
 Остановить контейнеры
