@@ -28,9 +28,8 @@ services:
     build:
       context: ./tests
       dockerfile: Dockerfile
-    restart: always
     depends_on:
-      - db
+      - app
 
 volumes:
   database:

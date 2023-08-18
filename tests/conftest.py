@@ -4,7 +4,7 @@ import asyncio
 
 from httpx import AsyncClient
 
-from main import app
+#from main import app
 
 
 @pytest.fixture(scope='session')
@@ -16,5 +16,5 @@ def event_loop():
 
 @pytest_asyncio.fixture(scope='function')
 async def client(event_loop):
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(base_url="http://app:8000") as ac:
         yield ac
