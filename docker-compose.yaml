@@ -23,10 +23,14 @@ services:
       - PYTHONUNBUFFERED=1
     env_file:
       - .env
+
   tests:
     build:
-      context: .
+      context: ./tests
       dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - db
 
 volumes:
   database:
