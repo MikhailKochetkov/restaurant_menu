@@ -90,7 +90,9 @@ docker-compose down -v
 
 ### Запуск тестов в Docker (docker-compose)
 
-Раздер в разработке
+```bash
+docker-compose exec app pytest tests -v
+```
 
 # Документация API
 Документация доступна по эндпойнту:  http://127.0.0.1:8000/docs/
