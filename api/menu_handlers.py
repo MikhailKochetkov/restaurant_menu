@@ -82,7 +82,9 @@ async def get_menus(session: AsyncSession = Depends(get_session)):
 
 
 @menu_router.get('/api/v1/menus/{menu_id}', tags=['Menus'])
-async def get_menu_by_id(menu_id: str, session: AsyncSession = Depends(get_session)):
+async def get_menu_by_id(
+        menu_id: str,
+        session: AsyncSession = Depends(get_session)):
     sub_query = select(
         SubMenu.menu_id,
         func.count(Dish.id).label('total_dishes')
@@ -136,7 +138,9 @@ async def update_menu(
 
 
 @menu_router.delete('/api/v1/menus/{menu_id}', tags=['Menus'])
-async def delete_menu(menu_id: str, session: AsyncSession = Depends(get_session)):
+async def delete_menu(
+        menu_id: str,
+        session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(Menu).filter_by(id=menu_id))
     menu = result.scalar_one_or_none()
     if not menu:

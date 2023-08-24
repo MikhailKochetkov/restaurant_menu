@@ -56,8 +56,12 @@ async def create_submenu(
 
 
 @submenu_router.get('/api/v1/menus/{menu_id}/submenus', tags=['Submenus'])
-async def get_submenus(menu_id: str, session: AsyncSession = Depends(get_session)):
-    submenus_result = await session.execute(select(SubMenu).filter_by(menu_id=menu_id))
+async def get_submenus(
+        menu_id: str,
+        session: AsyncSession = Depends(get_session)):
+    submenus_result = await session.execute(
+        select(SubMenu).filter_by(menu_id=menu_id)
+    )
     submenus = submenus_result.all()
     result = []
     for submenu in submenus:
@@ -93,7 +97,11 @@ async def get_submenu_by_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu not found'
         )
-    dishes = await session.execute(select(func.count(Dish.submenu_id)).filter(Dish.submenu_id == submenu.id))
+    dishes = await session.execute(
+        select(
+            func.count(Dish.submenu_id)
+        ).filter(Dish.submenu_id == submenu.id)
+    )
     dishes_count = dishes.scalar()
     return {
         "id": submenu.id,
@@ -111,7 +119,9 @@ async def update_submenu(
         submenu_id: str,
         request: SubMenuPatchRequest,
         session: AsyncSession = Depends(get_session)):
-    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    submenu_result = await session.execute(
+        select(SubMenu).filter_by(id=submenu_id)
+    )
     submenu = submenu_result.scalar_one_or_none()
     if not submenu:
         raise HTTPException(

@@ -5,7 +5,7 @@ from fastapi import (
     status)
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql import func, select
+from sqlalchemy.sql import select
 from uuid import uuid4
 
 from db.models import Dish, SubMenu, Menu
@@ -40,7 +40,9 @@ async def create_dish(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='the data are not valid'
         )
-    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    submenu_result = await session.execute(
+        select(SubMenu).filter_by(id=submenu_id)
+    )
     if not submenu_result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -79,12 +81,17 @@ async def get_dishes(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    submenu_result = await session.execute(select(SubMenu).filter_by(
+    submenu_result = await session.execute(
+        select(SubMenu).filter_by(
             id=submenu_id,
-            menu_id=menu_id))
+            menu_id=menu_id
+        )
+    )
     if not submenu_result.scalar_one_or_none():
         return []
-    dishes_result = await session.execute(select(Dish).filter_by(submenu_id=submenu_id))
+    dishes_result = await session.execute(
+        select(Dish).filter_by(submenu_id=submenu_id)
+    )
     for dish in dishes_result:
         data = {
             "id": dish[0].id,
@@ -118,7 +125,9 @@ async def get_dish_by_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    submenu_result = await session.execute(
+        select(SubMenu).filter_by(id=submenu_id)
+    )
     submenu = submenu_result.scalar_one_or_none()
     if not submenu:
         raise HTTPException(
@@ -156,7 +165,9 @@ async def update_dish(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    submenu_result = await session.execute(
+        select(SubMenu).filter_by(id=submenu_id)
+    )
     submenu = submenu_result.scalar_one_or_none()
     if not submenu:
         raise HTTPException(
@@ -196,7 +207,9 @@ async def delete_dish(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    submenu_result = await session.execute(select(SubMenu).filter_by(id=submenu_id))
+    submenu_result = await session.execute(
+        select(SubMenu).filter_by(id=submenu_id)
+    )
     submenu = submenu_result.scalar_one_or_none()
     if not submenu:
         raise HTTPException(

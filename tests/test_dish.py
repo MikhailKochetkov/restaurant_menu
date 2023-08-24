@@ -104,7 +104,9 @@ async def test_get_dish_by_id(client):
     dish_data = dish_response.json()
     real_dish_id = dish_data["id"]
     get_dish_response = await client.get(
-        f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}/dishes/{real_dish_id}'
+        (f'/api/v1/menus/{real_menu_id}'
+         f'/submenus/{real_submenu_id}'
+         f'/dishes/{real_dish_id}')
     )
     assert get_dish_response.status_code == status.HTTP_200_OK
     assert get_dish_response.json()["id"] == real_dish_id
@@ -155,12 +157,14 @@ async def test_update_dish(client):
     )
     real_dish_id = dish_response.json()["id"]
     upd_dish = {
-        "title": f"updated test dish title",
-        "description": f"updated test dish description",
+        "title": "updated test dish title",
+        "description": "updated test dish description",
         "price": 12.12,
     }
     patch_response = await client.patch(
-        f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}/dishes/{real_dish_id}',
+        (f'/api/v1/menus/{real_menu_id}'
+         f'/submenus/{real_submenu_id}'
+         f'/dishes/{real_dish_id}'),
         json=upd_dish
     )
     patch_data = patch_response.json()
@@ -217,23 +221,31 @@ async def test_delete_dish(client):
     real_dish_id = dish_response.json()["id"]
     menu_id = "77-aa-9-0"
     del_response = await client.delete(
-        f'/api/v1/menus/{menu_id}/submenus/{real_submenu_id}/dishes/{real_dish_id}'
+        (f'/api/v1/menus/{menu_id}'
+         f'/submenus/{real_submenu_id}'
+         f'/dishes/{real_dish_id}')
     )
     assert del_response.status_code == status.HTTP_404_NOT_FOUND
     assert del_response.json()["detail"] == "menu does not exist"
     submenu_id = "00-00"
     del_response = await client.delete(
-        f'/api/v1/menus/{real_menu_id}/submenus/{submenu_id}/dishes/{real_dish_id}'
+        (f'/api/v1/menus/{real_menu_id}'
+         f'/submenus/{submenu_id}'
+         f'/dishes/{real_dish_id}')
     )
     assert del_response.status_code == status.HTTP_404_NOT_FOUND
     assert del_response.json()["detail"] == "submenu does not exist"
     del_response = await client.delete(
-        f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}/dishes/{real_dish_id}'
+        (f'/api/v1/menus/{real_menu_id}'
+         f'/submenus/{real_submenu_id}'
+         f'/dishes/{real_dish_id}')
     )
     assert del_response.json()["message"] == "dish deleted successfully"
     dish_id = "88-99"
     del_response = await client.delete(
-        f'/api/v1/menus/{real_menu_id}/submenus/{real_submenu_id}/dishes/{dish_id}'
+        (f'/api/v1/menus/{real_menu_id}'
+         f'/submenus/{real_submenu_id}'
+         f'/dishes/{dish_id}')
     )
     assert del_response.status_code == status.HTTP_404_NOT_FOUND
     assert del_response.json()["detail"] == "dish not found"
