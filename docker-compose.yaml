@@ -23,6 +23,8 @@ services:
       - PYTHONUNBUFFERED=1
     env_file:
       - .env
+    volumes:
+      - shared-dir:/app/tests
 
   tests:
     build:
@@ -30,6 +32,9 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - app
+    volumes:
+      - shared-dir:/tests
 
 volumes:
   database:
+  shared-dir:
