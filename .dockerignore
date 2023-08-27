@@ -11,3 +11,4 @@ tests
 .github
 setup.cfg
 postman_tests
+.mypy_cache
