@@ -2,7 +2,10 @@ import pytest
 from fastapi import status
 
 from .conftest import client
-from .helpers import create_unique_dish, create_unique_menu, create_unique_submenu
+from .helpers import (
+    create_unique_dish,
+    create_unique_menu,
+    create_unique_submenu)
 
 
 @pytest.mark.asyncio
