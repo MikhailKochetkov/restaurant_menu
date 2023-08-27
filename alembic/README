@@ -1,0 +1,11 @@
+### Миграции
+
+Создать миграцию:
+```bash
+alembic revision --autogenerate -m 'initial'
+```
+
+Выполнить миграцию:
+```bash
+alembic upgrade head
+```

@@ -1,23 +1,17 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status)
-from pydantic import ValidationError
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import func
 from uuid import uuid4
 
-from db.models import SubMenu, Dish
-from db.session import get_db
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import ValidationError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import func, select
+
+from db.models import Dish, Menu, SubMenu
+from db.session import get_session
+
 from .schemas import (
     SubMenuCreateRequest,
     SubMenuCreateResponse,
     SubMenuPatchRequest)
-from .helpers import (
-    check_submenu_by_menu_id,
-    get_first_menu,
-    get_first_submenu)
 
 submenu_router = APIRouter()
 
@@ -30,52 +24,55 @@ submenu_router = APIRouter()
 async def create_submenu(
         menu_id: str,
         request: SubMenuCreateRequest,
-        session: Session = Depends(get_db)):
+        session: AsyncSession = Depends(get_session)):
     try:
         submenu = SubMenu(
             id=str(uuid4()),
             title=request.title,
             description=request.description,
             menu_id=menu_id)
-    except ValidationError as e:
+    except ValidationError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='the data are not valid'
         )
-    if not get_first_menu(session, menu_id):
+    menu_result = await session.execute(select(Menu).filter_by(id=menu_id))
+    if not menu_result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
         )
-    if session.query(SubMenu).filter_by(menu_id=menu_id).first():
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail='submenu already exists'
-        )
     session.add(submenu)
-    session.commit()
-    session.refresh(submenu)
-    session.close()
+    await session.commit()
+    await session.refresh(submenu)
+    await session.close()
     return {
-        "id": submenu.id,
-        "title": submenu.title,
-        "description": submenu.description
+        'id': submenu.id,
+        'title': submenu.title,
+        'description': submenu.description
     }
 
 
 @submenu_router.get('/api/v1/menus/{menu_id}/submenus', tags=['Submenus'])
-async def get_submenus(menu_id: str, session: Session = Depends(get_db)):
-    submenus = session.query(SubMenu).filter_by(menu_id=menu_id).all()
+async def get_submenus(
+        menu_id: str,
+        session: AsyncSession = Depends(get_session)):
+    submenus_result = await session.execute(
+        select(SubMenu).filter_by(menu_id=menu_id)
+    )
+    submenus = submenus_result.all()
     result = []
     for submenu in submenus:
-        dishes_count = session.query(
-            func.count(Dish.id)
-        ).filter(Dish.submenu_id == submenu.id).scalar()
+        dishes = await session.execute(
+            select(
+                func.count(Dish.id)
+            ).filter(Dish.submenu_id == submenu[0].id))
+        dishes_count = dishes.scalar()
         data = {
-            "id": submenu.id,
-            "title": submenu.title,
-            "description": submenu.description,
-            "dishes_count": dishes_count
+            'id': submenu[0].id,
+            'title': submenu[0].title,
+            'description': submenu[0].description,
+            'dishes_count': dishes_count
         }
         result.append(data)
     return result
@@ -87,16 +84,28 @@ async def get_submenus(menu_id: str, session: Session = Depends(get_db)):
 async def get_submenu_by_id(
         menu_id: str,
         submenu_id: str,
-        session: Session = Depends(get_db)):
-    submenu = check_submenu_by_menu_id(session, menu_id, submenu_id)
-    dishes_count = session.query(
-        func.count(Dish.submenu_id)
-    ).filter(Dish.submenu_id == submenu.id).scalar()
+        session: AsyncSession = Depends(get_session)):
+    submenu_result = await session.execute(select(SubMenu).filter_by(
+        id=submenu_id,
+        menu_id=menu_id
+    ))
+    submenu = submenu_result.scalar_one_or_none()
+    if not submenu:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='submenu not found'
+        )
+    dishes = await session.execute(
+        select(
+            func.count(Dish.submenu_id)
+        ).filter(Dish.submenu_id == submenu.id)
+    )
+    dishes_count = dishes.scalar()
     return {
-        "id": submenu.id,
-        "title": submenu.title,
-        "description": submenu.description,
-        "dishes_count": dishes_count
+        'id': submenu.id,
+        'title': submenu.title,
+        'description': submenu.description,
+        'dishes_count': dishes_count
     }
 
 
@@ -107,14 +116,19 @@ async def update_submenu(
         menu_id: str,
         submenu_id: str,
         request: SubMenuPatchRequest,
-        session: Session = Depends(get_db)):
-    submenu = get_first_submenu(session, submenu_id)
+        session: AsyncSession = Depends(get_session)):
+    submenu_result = await session.execute(
+        select(SubMenu).filter_by(id=submenu_id)
+    )
+    submenu = submenu_result.scalar_one_or_none()
     if not submenu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='submenu not found'
         )
-    if not get_first_menu(session, menu_id):
+    menu_result = await session.execute(select(Menu).filter_by(id=menu_id))
+    menu = menu_result.scalar_one_or_none()
+    if not menu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='menu does not exist'
@@ -123,8 +137,8 @@ async def update_submenu(
         submenu.title = request.title
     if request.description:
         submenu.description = request.description
-    session.commit()
-    session.refresh(submenu)
+    await session.commit()
+    await session.refresh(submenu)
     return submenu
 
 
@@ -134,8 +148,17 @@ async def update_submenu(
 async def delete_submenu(
         menu_id: str,
         submenu_id: str,
-        session: Session = Depends(get_db)):
-    submenu = check_submenu_by_menu_id(session, menu_id, submenu_id)
-    session.delete(submenu)
-    session.commit()
-    return {"message": "menu deleted successfully"}
+        session: AsyncSession = Depends(get_session)):
+    submenu_result = await session.execute(
+        select(SubMenu)
+        .filter_by(id=submenu_id, menu_id=menu_id)
+    )
+    submenu = submenu_result.scalar_one_or_none()
+    if not submenu:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='submenu not found'
+        )
+    await session.delete(submenu)
+    await session.commit()
+    return {'message': 'submenu deleted successfully'}

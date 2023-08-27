@@ -1,11 +1,11 @@
 FROM python:3.10-slim
 
-WORKDIR /api
+WORKDIR /app
 
-COPY ./requirements.txt /api/requirements.txt
+COPY ./requirements.txt /app/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /api/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
-COPY . /api
+COPY . /app
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

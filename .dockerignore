@@ -1,0 +1,14 @@
+.env
+.env.sample
+.gitignore
+LICENSE
+README.md
+venv
+.git
+.idea
+tests
+.pytest_cache
+.github
+setup.cfg
+postman_tests
+.mypy_cache

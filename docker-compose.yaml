@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:13.0-alpine
+    image: postgres:15.1-alpine
     restart: always
     volumes:
       - database:/var/lib/postgresql/data/
@@ -10,7 +10,9 @@ services:
       - .env
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: uvicorn main:app --host 0.0.0.0
     ports:
       - "8000:8000"
@@ -21,6 +23,15 @@ services:
       - PYTHONUNBUFFERED=1
     env_file:
       - .env
+    volumes:
+      - ./tests:/app/tests
+
+  tests:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    depends_on:
+      - app
 
 volumes:
   database:

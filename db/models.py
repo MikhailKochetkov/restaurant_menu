@@ -1,44 +1,48 @@
-from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 
 class Menu(Base):
     __tablename__ = 'menus'
 
-    id = Column(String, primary_key=True, index=True)
-    title = Column(String, unique=True)
-    description = Column(String)
+    id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(64), unique=True)
+    description: Mapped[str] = mapped_column(String(128))
+
     submenus = relationship(
-        'SubMenu',
-        back_populates='menu',
-        cascade='all, delete'
+        'SubMenu', back_populates='menu', cascade='all, delete'
     )
 
 
 class SubMenu(Base):
     __tablename__ = 'submenus'
 
-    id = Column(String, primary_key=True, index=True)
-    title = Column(String)
-    description = Column(String)
-    menu_id = Column(String, ForeignKey('menus.id'), nullable=False)
+    id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(64))
+    description: Mapped[str] = mapped_column(String(128))
+    menu_id: Mapped[int] = mapped_column(
+        ForeignKey('menus.id'), nullable=False
+    )
+
     menu = relationship('Menu', back_populates='submenus')
     dishes = relationship(
-        'Dish',
-        back_populates='submenu',
-        cascade='all, delete'
+        'Dish', back_populates='submenu', cascade='all, delete'
     )
 
 
 class Dish(Base):
     __tablename__ = 'dishes'
 
-    id = Column(String, primary_key=True, index=True)
-    title = Column(String)
-    description = Column(String)
-    price = Column(String)
-    submenu_id = Column(String, ForeignKey('submenus.id'), nullable=False)
+    id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(64))
+    description: Mapped[str] = mapped_column(String(128))
+    price: Mapped[str] = mapped_column(String(64))
+    submenu_id: Mapped[str] = mapped_column(
+        String, ForeignKey('submenus.id'), nullable=False
+    )
+
     submenu = relationship('SubMenu', back_populates='dishes')
