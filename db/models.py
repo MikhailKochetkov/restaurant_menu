@@ -1,8 +1,9 @@
-from sqlalchemy import String, ForeignKey
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 
 class Menu(Base):
