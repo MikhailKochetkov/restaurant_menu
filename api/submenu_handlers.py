@@ -1,19 +1,14 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status)
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import func, select
-from uuid import uuid4
 
-from db.models import SubMenu, Dish, Menu
+from db.models import Dish, Menu, SubMenu
 from db.session import get_session
-from .schemas import (
-    SubMenuCreateRequest,
-    SubMenuCreateResponse,
-    SubMenuPatchRequest)
+
+from .schemas import SubMenuCreateRequest, SubMenuCreateResponse, SubMenuPatchRequest
 
 submenu_router = APIRouter()
 
@@ -49,9 +44,9 @@ async def create_submenu(
     await session.refresh(submenu)
     await session.close()
     return {
-        "id": submenu.id,
-        "title": submenu.title,
-        "description": submenu.description
+        'id': submenu.id,
+        'title': submenu.title,
+        'description': submenu.description
     }
 
 
@@ -71,10 +66,10 @@ async def get_submenus(
             ).filter(Dish.submenu_id == submenu[0].id))
         dishes_count = dishes.scalar()
         data = {
-            "id": submenu[0].id,
-            "title": submenu[0].title,
-            "description": submenu[0].description,
-            "dishes_count": dishes_count
+            'id': submenu[0].id,
+            'title': submenu[0].title,
+            'description': submenu[0].description,
+            'dishes_count': dishes_count
         }
         result.append(data)
     return result
@@ -104,10 +99,10 @@ async def get_submenu_by_id(
     )
     dishes_count = dishes.scalar()
     return {
-        "id": submenu.id,
-        "title": submenu.title,
-        "description": submenu.description,
-        "dishes_count": dishes_count
+        'id': submenu.id,
+        'title': submenu.title,
+        'description': submenu.description,
+        'dishes_count': dishes_count
     }
 
 
@@ -163,4 +158,4 @@ async def delete_submenu(
         )
     await session.delete(submenu)
     await session.commit()
-    return {"message": "submenu deleted successfully"}
+    return {'message': 'submenu deleted successfully'}

@@ -1,19 +1,14 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status)
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import func, select
-from uuid import uuid4
 
-from db.models import Menu, SubMenu, Dish
+from db.models import Dish, Menu, SubMenu
 from db.session import get_session
-from .schemas import (
-    MenuCreateRequest,
-    MenuCreateResponse,
-    MenuPatchRequest)
+
+from .schemas import MenuCreateRequest, MenuCreateResponse, MenuPatchRequest
 
 menu_router = APIRouter()
 
@@ -48,9 +43,9 @@ async def create_menu(
     await session.refresh(menu)
     await session.close()
     return {
-        "id": menu.id,
-        "title": menu.title,
-        "description": menu.description
+        'id': menu.id,
+        'title': menu.title,
+        'description': menu.description
     }
 
 
@@ -73,11 +68,11 @@ async def get_menus(session: AsyncSession = Depends(get_session)):
         .group_by(Menu.id, sub_query.c.total_dishes))
     result = query.all()
     return [{
-        "id": q[0].id,
-        "title": q[0].title,
-        "description": q[0].description,
-        "submenus_count": q[1],
-        "dishes_count": q[2]
+        'id': q[0].id,
+        'title': q[0].title,
+        'description': q[0].description,
+        'submenus_count': q[1],
+        'dishes_count': q[2]
     } for q in result]
 
 
@@ -105,14 +100,14 @@ async def get_menu_by_id(
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="menu not found"
+            detail='menu not found'
         )
     return {
-        "id": result[0].id,
-        "title": result[0].title,
-        "description": result[0].description,
-        "submenus_count": result[1],
-        "dishes_count": result[2]
+        'id': result[0].id,
+        'title': result[0].title,
+        'description': result[0].description,
+        'submenus_count': result[1],
+        'dishes_count': result[2]
     }
 
 
@@ -126,7 +121,7 @@ async def update_menu(
     if not menu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="menu not found"
+            detail='menu not found'
         )
     if request.title:
         menu.title = request.title
@@ -146,8 +141,8 @@ async def delete_menu(
     if not menu:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="menu not found"
+            detail='menu not found'
         )
     await session.delete(menu)
     await session.commit()
-    return {"message": "menu deleted successfully"}
+    return {'message': 'menu deleted successfully'}

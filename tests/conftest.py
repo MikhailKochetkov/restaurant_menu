@@ -1,7 +1,7 @@
-import pytest
-import pytest_asyncio
 import asyncio
 
+import pytest
+import pytest_asyncio
 from httpx import AsyncClient
 
 from main import app
@@ -16,5 +16,5 @@ def event_loop():
 
 @pytest_asyncio.fixture(scope='function')
 async def client(event_loop):
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(app=app, base_url='http://test') as ac:
         yield ac

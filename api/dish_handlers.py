@@ -1,19 +1,14 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status)
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
-from uuid import uuid4
 
-from db.models import Dish, SubMenu, Menu
+from db.models import Dish, Menu, SubMenu
 from db.session import get_session
-from .schemas import (
-    DishCreateRequest,
-    DishCreateResponse,
-    DishPatchRequest)
+
+from .schemas import DishCreateRequest, DishCreateResponse, DishPatchRequest
 
 dish_router = APIRouter()
 
@@ -59,10 +54,10 @@ async def create_dish(
     await session.refresh(dish)
     await session.close()
     return {
-        "id": dish.id,
-        "title": dish.title,
-        "description": dish.description,
-        "price": dish.price
+        'id': dish.id,
+        'title': dish.title,
+        'description': dish.description,
+        'price': dish.price
     }
 
 
@@ -94,10 +89,10 @@ async def get_dishes(
     )
     for dish in dishes_result:
         data = {
-            "id": dish[0].id,
-            "title": dish[0].title,
-            "description": dish[0].description,
-            "price": dish[0].price
+            'id': dish[0].id,
+            'title': dish[0].title,
+            'description': dish[0].description,
+            'price': dish[0].price
         }
         result.append(data)
     return result
@@ -135,10 +130,10 @@ async def get_dish_by_id(
             detail='submenu does not exist'
         )
     return {
-        "id": dish.id,
-        "title": dish.title,
-        "description": dish.description,
-        "price": dish.price
+        'id': dish.id,
+        'title': dish.title,
+        'description': dish.description,
+        'price': dish.price
     }
 
 
@@ -218,4 +213,4 @@ async def delete_dish(
         )
     await session.delete(dish)
     await session.commit()
-    return {"message": "dish deleted successfully"}
+    return {'message': 'dish deleted successfully'}
