@@ -11,3 +11,4 @@ asyncpg
 pytest-asyncio
 alembic
 asgiref
+aioredis

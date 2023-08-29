@@ -8,6 +8,7 @@ venv
 .idea
 tests
 .pytest_cache
+tests/.pytest_cache
 .github
 setup.cfg
 postman_tests
