@@ -10,7 +10,9 @@ class Base(DeclarativeBase):
 class Menu(Base):
     __tablename__ = 'menus'
 
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True)
+    id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, index=True
+    )
     title: Mapped[str] = mapped_column(String(64), unique=True)
     description: Mapped[str] = mapped_column(String(128))
 
@@ -22,7 +24,9 @@ class Menu(Base):
 class SubMenu(Base):
     __tablename__ = 'submenus'
 
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True)
+    id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, index=True
+    )
     title: Mapped[str] = mapped_column(String(64), unique=True)
     description: Mapped[str] = mapped_column(String(128))
     menu_id: Mapped[int] = mapped_column(
@@ -38,7 +42,9 @@ class SubMenu(Base):
 class Dish(Base):
     __tablename__ = 'dishes'
 
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True)
+    id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, index=True
+    )
     title: Mapped[str] = mapped_column(String(64), unique=True)
     description: Mapped[str] = mapped_column(String(128))
     price: Mapped[str] = mapped_column(String(64))
