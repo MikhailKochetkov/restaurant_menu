@@ -27,7 +27,7 @@ async def create_submenu(
         session: AsyncSession = Depends(get_session)):
     try:
         submenu = SubMenu(
-            id=str(uuid4()),
+            id=uuid4(),
             title=request.title,
             description=request.description,
             menu_id=menu_id)

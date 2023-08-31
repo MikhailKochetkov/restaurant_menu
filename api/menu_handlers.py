@@ -23,7 +23,7 @@ async def create_menu(
         session: AsyncSession = Depends(get_session)):
     try:
         menu = Menu(
-            id=str(uuid4()),
+            id=uuid4(),
             title=request.title,
             description=request.description
         )
