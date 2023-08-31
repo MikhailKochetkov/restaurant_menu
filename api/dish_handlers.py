@@ -10,7 +10,9 @@ from db.session import get_session
 
 from .schemas import DishCreateRequest, DishCreateResponse, DishPatchRequest
 
-dish_router = APIRouter(prefix='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes')
+dish_router = APIRouter(
+    prefix='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes'
+)
 
 
 @dish_router.post(

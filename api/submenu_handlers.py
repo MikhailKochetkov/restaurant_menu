@@ -8,7 +8,10 @@ from sqlalchemy.sql import func, select
 from db.models import Dish, Menu, SubMenu
 from db.session import get_session
 
-from .schemas import SubMenuCreateRequest, SubMenuCreateResponse, SubMenuPatchRequest
+from .schemas import (
+    SubMenuCreateRequest,
+    SubMenuCreateResponse,
+    SubMenuPatchRequest)
 
 submenu_router = APIRouter(prefix='/api/v1/menus/{menu_id}/submenus')
 
