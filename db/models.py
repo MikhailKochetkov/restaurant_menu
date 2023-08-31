@@ -29,7 +29,7 @@ class SubMenu(Base):
     )
     title: Mapped[str] = mapped_column(String(64), unique=True)
     description: Mapped[str] = mapped_column(String(128))
-    menu_id: Mapped[int] = mapped_column(
+    menu_id: Mapped[UUID] = mapped_column(
         ForeignKey('menus.id'), nullable=False
     )
 
@@ -48,8 +48,8 @@ class Dish(Base):
     title: Mapped[str] = mapped_column(String(64), unique=True)
     description: Mapped[str] = mapped_column(String(128))
     price: Mapped[str] = mapped_column(String(64))
-    submenu_id: Mapped[str] = mapped_column(
-        String, ForeignKey('submenus.id'), nullable=False
+    submenu_id: Mapped[UUID] = mapped_column(
+        ForeignKey('submenus.id'), nullable=False
     )
 
     submenu = relationship('SubMenu', back_populates='dishes')
