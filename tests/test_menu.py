@@ -10,6 +10,19 @@ PREFIX = '/api/v1/menus'
 
 
 @pytest.mark.asyncio
+async def test_get_menus(client):
+    menu = create_unique_menu()
+    post_response = await client.post(f'{PREFIX}/', json=menu)
+    post_data = post_response.json()
+    get_response = await client.get(f'{PREFIX}/')
+    get_data = get_response.json()
+    assert get_response.status_code == status.HTTP_200_OK
+    assert get_data[0]['id'] == post_data['id']
+    assert get_data[0]['title'] == post_data['title']
+    assert get_data[0]['description'] == post_data['description']
+
+
+@pytest.mark.asyncio
 async def test_create_menu(client):
     menu = create_unique_menu()
     post_response = await client.post(f'{PREFIX}/', json=menu)
@@ -23,17 +36,6 @@ async def test_create_menu(client):
     post_response = await client.post(f'{PREFIX}/', json=menu)
     assert post_response.status_code == status.HTTP_409_CONFLICT
     assert post_response.json()['detail'] == 'menu already exists'
-
-
-@pytest.mark.asyncio
-async def test_get_menus(client):
-    get_menu_response = await client.get(f'{PREFIX}/')
-    get_resp_data = get_menu_response.json()
-    assert get_menu_response.status_code == status.HTTP_200_OK
-    for i in range(len(get_resp_data)):
-        assert 'id' in get_resp_data[i]
-        assert 'title' in get_resp_data[i]
-        assert 'description' in get_resp_data[i]
 
 
 @pytest.mark.asyncio
