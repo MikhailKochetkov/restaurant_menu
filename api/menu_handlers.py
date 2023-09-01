@@ -132,7 +132,7 @@ async def update_menu(
     return menu
 
 
-@menu_router.delete('/api/v1/menus/{menu_id}', tags=['Menus'])
+@menu_router.delete('/{menu_id}', tags=['Menus'])
 async def delete_menu(
         menu_id: str,
         session: AsyncSession = Depends(get_session)):

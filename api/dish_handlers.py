@@ -64,7 +64,7 @@ async def create_dish(
 
 
 @dish_router.get(
-    '',
+    '/',
     tags=['Dishes'])
 async def get_dishes(
         menu_id: str,
