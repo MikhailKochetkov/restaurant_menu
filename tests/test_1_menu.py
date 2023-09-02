@@ -11,6 +11,9 @@ PREFIX = '/api/v1/menus'
 
 @pytest.mark.asyncio
 async def test_get_menus(client):
+    get_response = await client.get(f'{PREFIX}/')
+    assert get_response.status_code == status.HTTP_200_OK
+    assert get_response.json() == []
     menu = create_unique_menu()
     post_response = await client.post(f'{PREFIX}/', json=menu)
     post_data = post_response.json()

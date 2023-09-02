@@ -4,10 +4,10 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine)
 
 from settings import DEV_MODE
-from .db_connection import PG_CONNECTION_STRING
+from .db_connection import CONNECTION_STRING
 
 if DEV_MODE:
-    engine = create_async_engine(PG_CONNECTION_STRING, pool_pre_ping=True)
+    engine = create_async_engine(CONNECTION_STRING, pool_pre_ping=True)
     async_session = async_sessionmaker(
         bind=engine, expire_on_commit=False, class_=AsyncSession
     )
