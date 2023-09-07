@@ -10,11 +10,13 @@ from db.session import get_session
 
 from .schemas import DishCreateRequest, DishCreateResponse, DishPatchRequest
 
-dish_router = APIRouter()
+dish_router = APIRouter(
+    prefix='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes'
+)
 
 
 @dish_router.post(
-    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    '/',
     response_model=DishCreateResponse,
     tags=['Dishes'],
     status_code=201)
@@ -25,7 +27,7 @@ async def create_dish(
         session: AsyncSession = Depends(get_session)):
     try:
         dish = Dish(
-            id=str(uuid4()),
+            id=uuid4(),
             title=request.title,
             description=request.description,
             price=str(round(request.price, 2)),
@@ -62,7 +64,7 @@ async def create_dish(
 
 
 @dish_router.get(
-    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    '/',
     tags=['Dishes'])
 async def get_dishes(
         menu_id: str,
@@ -99,7 +101,7 @@ async def get_dishes(
 
 
 @dish_router.get(
-    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    '/{dish_id}',
     tags=['Dishes'])
 async def get_dish_by_id(
         menu_id: str,
@@ -138,7 +140,7 @@ async def get_dish_by_id(
 
 
 @dish_router.patch(
-    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    '/{dish_id}',
     tags=['Dishes'])
 async def update_dish(
         menu_id: str,
@@ -181,7 +183,7 @@ async def update_dish(
 
 
 @dish_router.delete(
-    '/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    '/{dish_id}',
     tags=['Dishes'])
 async def delete_dish(
         menu_id: str,

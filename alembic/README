@@ -1,11 +1,1 @@
-### Миграции
-
-Создать миграцию:
-```bash
-alembic revision --autogenerate -m 'initial'
-```
-
-Выполнить миграцию:
-```bash
-alembic upgrade head
-```
+Generic single-database configuration with an async dbapi.

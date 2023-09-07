@@ -90,8 +90,15 @@ docker-compose down -v
 
 ### Запуск тестов в Docker (docker-compose)
 
+Настроить (проверить) значение строки подключения к тестовой базе данных (файл db/db_connection.py)
+
 ```bash
-docker-compose exec app pytest tests -v
+TEST_CONNECTION_STRING = "postgresql+asyncpg://postgres:postgres@test-db:5432/test_database"
+```
+
+Собрать контейнеры
+```bash
+docker-compose -f docker-compose_test.yaml up
 ```
 
 # Документация API

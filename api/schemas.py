@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import UUID4, BaseModel
 
 
 class MenuCreateRequest(BaseModel):
@@ -7,7 +7,7 @@ class MenuCreateRequest(BaseModel):
 
 
 class MenuCreateResponse(BaseModel):
-    id: str
+    id: UUID4
     title: str
     description: str
 
@@ -18,7 +18,7 @@ class SubMenuCreateRequest(BaseModel):
 
 
 class SubMenuCreateResponse(BaseModel):
-    id: str
+    id: UUID4
     title: str
     description: str
 
@@ -30,7 +30,7 @@ class DishCreateRequest(BaseModel):
 
 
 class DishCreateResponse(BaseModel):
-    id: str
+    id: UUID4
     title: str
     description: str
     price: str

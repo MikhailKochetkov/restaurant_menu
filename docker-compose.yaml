@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  restaurant_network:
+    driver: bridge
+
 services:
   db:
     image: postgres:15.1-alpine
@@ -8,12 +12,14 @@ services:
       - database:/var/lib/postgresql/data/
     env_file:
       - .env
+    networks:
+      - restaurant_network
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    command: uvicorn main:app --host 0.0.0.0
+    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0"
     ports:
       - "8000:8000"
     restart: always
@@ -23,15 +29,8 @@ services:
       - PYTHONUNBUFFERED=1
     env_file:
       - .env
-    volumes:
-      - ./tests:/app/tests
-
-  tests:
-    build:
-      context: ./tests
-      dockerfile: Dockerfile
-    depends_on:
-      - app
+    networks:
+      - restaurant_network
 
 volumes:
   database:

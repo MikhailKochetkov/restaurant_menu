@@ -13,11 +13,11 @@ from .schemas import (
     SubMenuCreateResponse,
     SubMenuPatchRequest)
 
-submenu_router = APIRouter()
+submenu_router = APIRouter(prefix='/api/v1/menus/{menu_id}/submenus')
 
 
 @submenu_router.post(
-    '/api/v1/menus/{menu_id}/submenus',
+    '/',
     tags=['Submenus'],
     response_model=SubMenuCreateResponse,
     status_code=201)
@@ -27,7 +27,7 @@ async def create_submenu(
         session: AsyncSession = Depends(get_session)):
     try:
         submenu = SubMenu(
-            id=str(uuid4()),
+            id=uuid4(),
             title=request.title,
             description=request.description,
             menu_id=menu_id)
@@ -53,7 +53,7 @@ async def create_submenu(
     }
 
 
-@submenu_router.get('/api/v1/menus/{menu_id}/submenus', tags=['Submenus'])
+@submenu_router.get('/', tags=['Submenus'])
 async def get_submenus(
         menu_id: str,
         session: AsyncSession = Depends(get_session)):
@@ -79,7 +79,7 @@ async def get_submenus(
 
 
 @submenu_router.get(
-    '/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    '/{submenu_id}',
     tags=['Submenus'])
 async def get_submenu_by_id(
         menu_id: str,
@@ -110,7 +110,7 @@ async def get_submenu_by_id(
 
 
 @submenu_router.patch(
-    '/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    '/{submenu_id}',
     tags=['Submenus'])
 async def update_submenu(
         menu_id: str,
@@ -143,7 +143,7 @@ async def update_submenu(
 
 
 @submenu_router.delete(
-    '/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    '/{submenu_id}',
     tags=['Submenus'])
 async def delete_submenu(
         menu_id: str,

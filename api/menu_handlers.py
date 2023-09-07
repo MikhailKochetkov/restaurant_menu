@@ -10,11 +10,11 @@ from db.session import get_session
 
 from .schemas import MenuCreateRequest, MenuCreateResponse, MenuPatchRequest
 
-menu_router = APIRouter()
+menu_router = APIRouter(prefix='/api/v1/menus')
 
 
 @menu_router.post(
-    '/api/v1/menus',
+    '/',
     tags=['Menus'],
     response_model=MenuCreateResponse,
     status_code=201)
@@ -23,7 +23,7 @@ async def create_menu(
         session: AsyncSession = Depends(get_session)):
     try:
         menu = Menu(
-            id=str(uuid4()),
+            id=uuid4(),
             title=request.title,
             description=request.description
         )
@@ -49,7 +49,7 @@ async def create_menu(
     }
 
 
-@menu_router.get('/api/v1/menus', tags=['Menus'])
+@menu_router.get('/', tags=['Menus'])
 async def get_menus(session: AsyncSession = Depends(get_session)):
     sub_query = select(
         SubMenu.menu_id,
@@ -76,7 +76,7 @@ async def get_menus(session: AsyncSession = Depends(get_session)):
     } for q in result]
 
 
-@menu_router.get('/api/v1/menus/{menu_id}', tags=['Menus'])
+@menu_router.get('/{menu_id}', tags=['Menus'])
 async def get_menu_by_id(
         menu_id: str,
         session: AsyncSession = Depends(get_session)):
@@ -111,7 +111,7 @@ async def get_menu_by_id(
     }
 
 
-@menu_router.patch('/api/v1/menus/{menu_id}', tags=['Menus'])
+@menu_router.patch('/{menu_id}', tags=['Menus'])
 async def update_menu(
         menu_id: str,
         request: MenuPatchRequest,
@@ -132,7 +132,7 @@ async def update_menu(
     return menu
 
 
-@menu_router.delete('/api/v1/menus/{menu_id}', tags=['Menus'])
+@menu_router.delete('/{menu_id}', tags=['Menus'])
 async def delete_menu(
         menu_id: str,
         session: AsyncSession = Depends(get_session)):
