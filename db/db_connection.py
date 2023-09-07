@@ -13,4 +13,4 @@ CONNECTION_STRING = (f'{os.getenv("PG_DB_URL", default="postgresql")}'
                      f'{os.getenv("POSTGRES_DB", default="database")}')
 
 TEST_CONNECTION_STRING = ('postgresql+asyncpg://'
-                          'postgres:postgres@localhost:5432/test_database')
+                          'postgres:postgres@test-db:5432/test_database')
