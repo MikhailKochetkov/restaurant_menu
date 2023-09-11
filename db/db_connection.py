@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 CONNECTION_STRING = (f'{os.getenv("PG_DB_URL", default="postgresql")}'
                      f'{os.getenv("POSTGRES_USER", default="postgres")}:'
                      f'{os.getenv("POSTGRES_PASSWORD", default="postgres")}'

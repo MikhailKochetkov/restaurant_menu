@@ -55,6 +55,7 @@ async def test_get_submenus(client):
     assert get_resp_data['id'] == post_resp_data['id']
     assert get_resp_data['title'] == post_resp_data['title']
     assert get_resp_data['description'] == post_resp_data['description']
+    assert isinstance(get_resp_data['dishes_count'], int)
 
 
 @pytest.mark.asyncio
@@ -77,6 +78,7 @@ async def test_get_submenu_by_id(client):
     assert get_resp_data['id'] == post_resp_data['id']
     assert get_resp_data['title'] == post_resp_data['title']
     assert get_resp_data['description'] == post_resp_data['description']
+    assert isinstance(get_resp_data['dishes_count'], int)
     submenu_id = '0000b000-0e00-00d0-a000-00000be000da'
     get_response = await client.get(
         f'{PREFIX}/{real_menu_id}/submenus/{submenu_id}'
