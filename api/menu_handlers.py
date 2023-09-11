@@ -17,7 +17,7 @@ menu_router = APIRouter(prefix='/api/v1/menus')
     '/',
     tags=['Menus'],
     response_model=MenuCreateResponse,
-    status_code=201)
+    status_code=status.HTTP_201_CREATED)
 async def create_menu(
         request: MenuCreateRequest,
         session: AsyncSession = Depends(get_session)):

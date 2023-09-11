@@ -23,6 +23,8 @@ async def test_get_menus(client):
     assert get_data[0]['id'] == post_data['id']
     assert get_data[0]['title'] == post_data['title']
     assert get_data[0]['description'] == post_data['description']
+    assert isinstance(get_data[0]['submenus_count'], int)
+    assert isinstance(get_data[0]['dishes_count'], int)
 
 
 @pytest.mark.asyncio
@@ -52,6 +54,8 @@ async def test_get_menu_by_id(client):
     assert get_data['id'] == menu_id
     assert get_data['title'] == menu['title']
     assert get_data['description'] == menu['description']
+    assert isinstance(get_data['submenus_count'], int)
+    assert isinstance(get_data['dishes_count'], int)
     menu_id = '0000b000-0e00-00d0-a000-00000be000da'
     get_response = await client.get(f'{PREFIX}/{menu_id}')
     assert get_response.status_code == status.HTTP_404_NOT_FOUND

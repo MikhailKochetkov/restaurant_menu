@@ -20,7 +20,7 @@ submenu_router = APIRouter(prefix='/api/v1/menus/{menu_id}/submenus')
     '/',
     tags=['Submenus'],
     response_model=SubMenuCreateResponse,
-    status_code=201)
+    status_code=status.HTTP_201_CREATED)
 async def create_submenu(
         menu_id: str,
         request: SubMenuCreateRequest,

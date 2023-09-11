@@ -19,7 +19,7 @@ dish_router = APIRouter(
     '/',
     response_model=DishCreateResponse,
     tags=['Dishes'],
-    status_code=201)
+    status_code=status.HTTP_201_CREATED)
 async def create_dish(
         menu_id: str,
         submenu_id: str,
